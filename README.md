@@ -1,199 +1,153 @@
-# My Claude Code Setup
+# Manuscript Submission Formatting Agent
 
-> **Work in progress.** This is not meant to be a polished guide for everyone. It's mostly a summary of how I've been using Claude Code for academic work — creating lecture slides, writing R scripts, managing Beamer-to-Quarto workflows, and so on. I keep learning new things, and as I do, I keep updating these files. This is just a way for me to share what I've figured out with friends and colleagues.
+A Claude Code workflow for reformatting research manuscripts to meet journal author guidelines — without altering scientific content.
 
-**Live site:** [psantanna.com/claude-code-my-workflow](https://psantanna.com/claude-code-my-workflow/)
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-02-24
 
-A ready-to-fork starter kit for academics using [Claude Code](https://code.claude.com/docs/en/overview) with **LaTeX/Beamer + R + Quarto**. You describe what you want; Claude plans the approach, runs specialized agents, fixes issues, verifies quality, and presents results — like a contractor who handles the entire job. Extracted from a production PhD course (6 lectures, 800+ slides).
+You provide a manuscript (.docx, .tex, or .pdf) and a journal's author guidelines URL. Claude parses the requirements, restructures the manuscript to comply, auto-drafts any missing required sections (marked as drafts for author review), and delivers a formatted `.docx` + `.md` with a full formatting report.
 
 ---
 
-## Quick Start (5 minutes)
+## Quick Start
 
-### 1. Fork & Clone
-
-```bash
-# Fork this repo on GitHub (click "Fork" on the repo page), then:
-git clone https://github.com/YOUR_USERNAME/claude-code-my-workflow.git my-project
-cd my-project
-```
-
-Replace `YOUR_USERNAME` with your GitHub username.
-
-### 2. Start Claude Code and Paste This Prompt
+### 1. Clone & Open
 
 ```bash
+git clone https://github.com/maxwell2732/my-submission-formatting-agent.git
+cd my-submission-formatting-agent
 claude
 ```
 
-**Using VS Code?** Open the Claude Code panel instead. Everything works the same — see the [full guide](https://psantanna.com/claude-code-my-workflow/workflow-guide.html#sec-setup) for details.
+### 2. Set Up a Journal (one-time per journal)
 
-Then paste the following, filling in your project details:
+```
+/parse-guidelines lancet-eb https://www.thelancet.com/pb/assets/raw/Lancet/authors/lancet-information-for-authors.pdf
+```
 
-> I am starting to work on **[PROJECT NAME]** in this repo. **[Describe your project in 2–3 sentences — what you're building, who it's for, what tools you use.]**
->
-> I want our collaboration to be structured, precise, and rigorous. When creating visuals, everything must be polished and publication-ready.
->
-> I've set up the Claude Code academic workflow (forked from `pedrohcgs/claude-code-my-workflow`). The configuration files are already in this repo. Please read them, understand the workflow, and then **update all configuration files to fit my project** — fill in placeholders in `CLAUDE.md`, adjust rules if needed, and propose any customizations specific to my use case.
->
-> After that, use the plan-first workflow for all non-trivial tasks. Once I approve a plan, switch to contractor mode — coordinate everything autonomously and only come back to me when there's ambiguity or a decision to make.
->
-> Enter plan mode and start by adapting the workflow configuration for this project.
+This fetches the author guidelines and saves structured requirements to `guidelines/lancet-eb.yml`.
 
-**What this does:** Claude reads all the configuration files, fills in your project name, institution, and preferences, then enters contractor mode — planning, implementing, reviewing, and verifying autonomously. You approve the plan and Claude handles the rest.
+### 3. Format a Manuscript
 
-**Prefer to configure manually?** See the [full guide](https://psantanna.com/claude-code-my-workflow/workflow-guide.html#sec-setup) for step-by-step manual setup instructions.
+Drop your manuscript into `manuscripts/`, then:
 
----
+```
+/format-manuscript manuscripts/paper.docx lancet-eb
+```
 
-## How It Works
+Claude will ingest the manuscript, analyze its structure, reformat it to comply with the journal's requirements, and deliver:
 
-### Contractor Mode
-
-You describe a task. For complex or ambiguous requests, Claude first creates a requirements specification with MUST/SHOULD/MAY priorities and clarity status (CLEAR/ASSUMED/BLOCKED). You approve the spec, then Claude plans the approach, implements it, runs specialized review agents, fixes issues, re-verifies, and scores against quality gates — all autonomously. You see a summary when the work meets quality standards. Say "just do it" and it auto-commits too.
-
-### Specialized Agents
-
-Instead of one general-purpose reviewer, 10 focused agents each check one dimension:
-
-- **proofreader** — grammar/typos
-- **slide-auditor** — visual layout
-- **pedagogy-reviewer** — teaching quality
-- **r-reviewer** — R code quality
-- **domain-reviewer** — field-specific correctness (template — customize for your field)
-
-Each is better at its narrow task than a generalist would be. The `/slide-excellence` skill runs them all in parallel.
-
-### Adversarial QA
-
-Two agents work in opposition: the **critic** reads both Beamer and Quarto and produces harsh findings. The **fixer** implements exactly what the critic found. They loop until the critic says "APPROVED" (or 5 rounds max). This catches errors that single-pass review misses.
-
-### Quality Gates
-
-Every file gets a score (0–100). Scores below threshold block the action:
-- **80** — commit threshold
-- **90** — PR threshold
-- **95** — excellence (aspirational)
-
-### Context Survival
-
-Plans, specifications, and session logs survive auto-compression and session boundaries. The PreCompact hook saves a context snapshot before Claude's auto-compression triggers, ensuring critical decisions are never lost. MEMORY.md accumulates learning across sessions, so patterns discovered in one session inform future work.
+- `outputs/lancet-eb/manuscript_formatted.docx` — ready for submission
+- `outputs/lancet-eb/manuscript_formatted.md` — markdown version for editing
+- `outputs/lancet-eb/formatting_report.md` — full summary of every change made
 
 ---
 
-## The Guide
+## What It Does
 
-For a comprehensive walkthrough, read the **[full guide](https://psantanna.com/claude-code-my-workflow/workflow-guide.html)** (or see the [source](guide/workflow-guide.qmd)).
+### Formatting pipeline (`/format-manuscript`)
 
-It covers:
-1. **Why This Workflow Exists** — the problem and the vision
-2. **Getting Started** — fork, paste one prompt, and Claude sets up the rest
-3. **The System in Action** — specialized agents, adversarial QA, quality scoring
-4. **The Building Blocks** — CLAUDE.md, rules, skills, agents, hooks, memory
-5. **Workflow Patterns** — lecture creation, translation, replication, multi-agent review, research exploration
-6. **Customizing for Your Domain** — creating your own reviewers and knowledge bases
+1. **Ingest** — converts .docx/.tex/.pdf to normalized markdown via pandoc
+2. **Analyze** — identifies all sections, detects IMRaD structure, compares against journal requirements
+3. **Reorder** — moves sections to match the journal's required order
+4. **Rename headings** — applies the journal's heading naming and case style
+5. **Restructure abstract** — converts unstructured abstracts to the journal's required structured format
+6. **Auto-draft missing sections** — synthesizes content from the manuscript for required sections that are absent (always marked `<!-- DRAFT: requires author review -->`)
+7. **Export** — produces `.docx` using a reference template and `.md` for version control
+8. **Compliance check** — PASS/WARN/FAIL checklist for every journal requirement
+9. **Quality score** — 0–100 compliance score
+10. **Proofread** — grammar, typos, draft marker integrity
+11. **Report** — `formatting_report.md` with before/after summary and required author actions
+
+### What it never does
+
+- Alter scientific content (numbers, results, citations, conclusions)
+- Silently add content — all auto-drafted sections are visibly marked as drafts
+- Cut content to meet word limits — those are flagged as warnings for the author
+
+---
+
+## Skills
+
+| Command | What It Does |
+|---------|-------------|
+| `/parse-guidelines [name] [URL]` | Extract journal requirements → `guidelines/[name].yml` |
+| `/format-manuscript [file] [journal]` | Full formatting pipeline |
+| `/validate-compliance [file] [journal]` | Standalone compliance check on any formatted file |
+| `/generate-report [journal]` | Generate formatting report with before/after diff |
+| `/proofread [file]` | Grammar, typos, draft marker check |
+| `/review-paper [file]` | Substantive manuscript review (structure, methods, referee objections) |
+| `/validate-bib` | Cross-reference citations |
+| `/commit [msg]` | Stage, commit, push |
 
 ---
 
 ## What's Included
 
 <details>
-<summary><strong>10 agents, 19 skills, 17 rules, 4 hooks</strong> (click to expand)</summary>
+<summary><strong>7 agents, 11 skills, 10 rules, 4 hooks</strong> (click to expand)</summary>
 
 ### Agents (`.claude/agents/`)
 
 | Agent | What It Does |
 |-------|-------------|
-| `proofreader` | Grammar, typos, overflow, consistency review |
-| `slide-auditor` | Visual layout audit (overflow, font consistency, spacing) |
-| `pedagogy-reviewer` | 13-pattern pedagogical review (narrative arc, notation density, pacing) |
-| `r-reviewer` | R code quality, reproducibility, and domain correctness |
-| `tikz-reviewer` | Merciless TikZ diagram visual critique |
-| `beamer-translator` | Beamer-to-Quarto translation specialist |
-| `quarto-critic` | Adversarial QA comparing Quarto against Beamer benchmark |
-| `quarto-fixer` | Implements fixes from the critic agent |
-| `verifier` | End-to-end task completion verification |
-| `domain-reviewer` | **Template** for your field-specific substance reviewer |
+| `manuscript-analyzer` | Section inventory, IMRaD detection, gap analysis vs. journal requirements |
+| `guidelines-extractor` | URL or pasted text → structured `guidelines/[journal].yml` |
+| `section-drafter` | Synthesizes missing required sections from existing manuscript content (always marks DRAFT) |
+| `compliance-checker` | PASS/WARN/FAIL checklist for every journal requirement |
+| `proofreader` | Grammar, typos, draft marker integrity, formatting artifacts |
+| `verifier` | Checks output files exist, are valid, and quality score passes |
+| `domain-reviewer` | **Template** — customize for your field's substance review |
 
 ### Skills (`.claude/skills/`)
 
 | Skill | What It Does |
 |-------|-------------|
-| `/compile-latex` | 3-pass XeLaTeX compilation with bibtex |
-| `/deploy` | Render Quarto + sync to GitHub Pages |
-| `/extract-tikz` | TikZ diagrams to PDF to SVG pipeline |
-| `/proofread` | Launch proofreader on a file |
-| `/visual-audit` | Launch slide-auditor on a file |
-| `/pedagogy-review` | Launch pedagogy-reviewer on a file |
-| `/review-r` | Launch R code reviewer |
-| `/qa-quarto` | Adversarial critic-fixer loop (max 5 rounds) |
-| `/slide-excellence` | Combined multi-agent review |
-| `/translate-to-quarto` | Full 11-phase Beamer-to-Quarto translation |
+| `/parse-guidelines` | Extract requirements from journal guidelines URL or pasted text |
+| `/format-manuscript` | Full 11-step formatting pipeline |
+| `/validate-compliance` | Standalone compliance check |
+| `/generate-report` | Formatting report with before/after diff |
+| `/proofread` | Launch proofreader on a manuscript file |
+| `/review-paper` | Full manuscript review (argument, methods, referee objections) |
 | `/validate-bib` | Cross-reference citations against bibliography |
-| `/devils-advocate` | Challenge design decisions before committing |
-| `/create-lecture` | Full lecture creation workflow |
-| `/commit` | Stage, commit, create PR, and merge to main |
-| `/lit-review` | Literature search, synthesis, and gap identification |
-| `/research-ideation` | Generate research questions and empirical strategies |
-| `/interview-me` | Interactive interview to formalize a research idea |
-| `/review-paper` | Manuscript review: structure, econometrics, referee objections |
-| `/data-analysis` | End-to-end R analysis with publication-ready output |
-
-### Research Workflow
-
-| Feature | What It Does |
-|---------|-------------|
-| Exploration folder | Structured `explorations/` sandbox with graduate/archive lifecycle |
-| Fast-track workflow | 60/100 quality threshold for rapid prototyping |
-| Simplified orchestrator | implement → verify → score → done (no multi-round reviews) |
-| Enhanced session logging | Structured tables for changes, decisions, verification |
-| Merge-only reporting | Quality reports at merge time only |
-| Math line-length exception | Long lines acceptable for documented formulas |
-| Workflow quick reference | One-page cheat sheet at `.claude/WORKFLOW_QUICK_REF.md` |
+| `/devils-advocate` | Challenge formatting decisions |
+| `/commit` | Stage, commit, push |
+| `/lit-review` | Literature search and synthesis |
+| `/research-ideation` | Research questions and empirical strategies |
 
 ### Rules (`.claude/rules/`)
 
-Rules use path-scoped loading: **always-on** rules load every session (~100 lines total); **path-scoped** rules load only when Claude works on matching files. Claude follows ~150 instructions reliably, so less is more.
-
-**Always-on** (no `paths:` frontmatter — load every session):
+**Always-on:**
 
 | Rule | What It Enforces |
 |------|-----------------|
 | `plan-first-workflow` | Plan mode for non-trivial tasks + context preservation |
 | `orchestrator-protocol` | Contractor mode: implement → verify → review → fix → score |
-| `session-logging` | Three logging triggers: post-plan, incremental, end-of-session |
+| `session-logging` | Post-plan, incremental, and end-of-session logs |
+| `meta-governance` | What belongs in the repo vs. gitignored |
 
 **Path-scoped** (load only when working on matching files):
 
 | Rule | Triggers On | What It Enforces |
 |------|------------|-----------------|
-| `verification-protocol` | `.tex`, `.qmd`, `docs/` | Task completion checklist |
-| `single-source-of-truth` | `Figures/`, `.tex`, `.qmd` | No content duplication; Beamer is authoritative |
-| `quality-gates` | `.tex`, `.qmd`, `*.R` | 80/90/95 scoring + tolerance thresholds |
-| `r-code-conventions` | `*.R` | R coding standards + math line-length exception |
-| `tikz-visual-quality` | `.tex` | TikZ diagram visual standards |
-| `beamer-quarto-sync` | `.tex`, `.qmd` | Auto-sync Beamer edits to Quarto |
+| `manuscript-handling` | `manuscripts/`, `outputs/` | Ingest pipeline, content integrity, draft markers |
+| `journal-compliance` | `guidelines/`, `outputs/` | Section order, abstract structure, heading style |
+| `output-generation` | `outputs/` | pandoc export, formatting report requirements |
+| `quality-gates` | `outputs/` | 80/90/95 scoring thresholds, manuscript rubric |
+| `proofreading-protocol` | `outputs/`, `manuscripts/` | Propose-first, then apply with approval |
 | `pdf-processing` | `master_supporting_docs/` | Safe large PDF handling |
-| `proofreading-protocol` | `.tex`, `.qmd`, `quality_reports/` | Propose-first, then apply with approval |
-| `no-pause-beamer` | `.tex` | No overlay commands in Beamer |
-| `replication-protocol` | `*.R` | Replicate original results before extending |
-| `knowledge-base-template` | `.tex`, `.qmd`, `*.R` | Notation/application registry template |
-| `orchestrator-research` | `*.R`, `explorations/` | Simple orchestrator for research (no multi-round reviews) |
-| `exploration-folder-protocol` | `explorations/` | Structured sandbox for experimental work |
-| `exploration-fast-track` | `explorations/` | Lightweight exploration workflow (60/100 threshold) |
 
 ### Templates (`templates/`)
 
 | Template | What It Does |
 |----------|-------------|
+| `journal-requirements.yml` | Annotated schema for journal YAML files (copy to `guidelines/`) |
+| `formatting-report.md` | Report template for formatting outputs |
+| `reference.docx` | Pandoc reference document for docx export |
 | `session-log.md` | Structured session logging format |
 | `quality-report.md` | Merge-time quality report format |
-| `exploration-readme.md` | Exploration project README template |
-| `archive-readme.md` | Archive documentation template |
-| `requirements-spec.md` | MUST/SHOULD/MAY requirements framework with clarity status |
-| `constitutional-governance.md` | Template for defining non-negotiable principles vs. preferences |
-| `skill-template.md` | Academic skill creation template with domain-specific examples |
+| `requirements-spec.md` | MUST/SHOULD/MAY requirements framework |
+| `constitutional-governance.md` | Non-negotiable principles vs. preferences template |
+| `skill-template.md` | Skill creation template |
 
 </details>
 
@@ -203,42 +157,39 @@ Rules use path-scoped loading: **always-on** rules load every session (~100 line
 
 | Tool | Required For | Install |
 |------|-------------|---------|
-| [Claude Code](https://code.claude.com/docs/en/overview) | Everything | `npm install -g @anthropic-ai/claude-code` |
-| XeLaTeX | LaTeX compilation | [TeX Live](https://tug.org/texlive/) or [MacTeX](https://tug.org/mactex/) |
-| [Quarto](https://quarto.org) | Web slides | [quarto.org/docs/get-started](https://quarto.org/docs/get-started/) |
-| R | Figures & analysis | [r-project.org](https://www.r-project.org/) |
-| pdf2svg | TikZ to SVG | `brew install pdf2svg` (macOS) |
-| [gh CLI](https://cli.github.com/) | PR workflow | `brew install gh` (macOS) |
-
-Not all tools are needed — install only what your project uses. Claude Code is the only hard requirement.
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) | Everything | `npm install -g @anthropic-ai/claude-code` |
+| [pandoc](https://pandoc.org) | Ingest + export | [pandoc.org/installing.html](https://pandoc.org/installing.html) |
+| [gh CLI](https://cli.github.com/) | PR workflow | `brew install gh` / [cli.github.com](https://cli.github.com/) |
+| Python 3.8+ | Quality scoring | [python.org](https://www.python.org/) |
+| pyyaml (optional) | Guidelines-aware scoring | `pip install pyyaml` |
 
 ---
 
-## Adapting for Your Field
+## File Layout
 
-1. **Fill in the knowledge base** (`.claude/rules/knowledge-base-template.md`) with your notation, applications, and design principles
-2. **Customize the domain reviewer** (`.claude/agents/domain-reviewer.md`) with review lenses specific to your field
-3. **Update the color palette** in your Quarto theme SCSS file — change the color variables at the top
-4. **Add field-specific R pitfalls** to `.claude/rules/r-code-conventions.md`
-5. **Fill in the lecture mapping** in `.claude/rules/beamer-quarto-sync.md`
-6. **Customize the workflow quick reference** (`.claude/WORKFLOW_QUICK_REF.md`) with your non-negotiables and preferences
-7. **Set up the exploration folder** (`explorations/`) for experimental work
-
----
-
-## Additional Resources
-
-- [Claude Code Documentation](https://code.claude.com/docs/en/overview)
-- [Writing a Good CLAUDE.md](https://code.claude.com/docs/en/memory) — official guidance on project memory
-
----
-
-## Origin
-
-This infrastructure was extracted from **Econ 730: Causal Panel Data** at Emory University, developed by Pedro Sant'Anna using Claude Code over 6+ sessions. The course produced 6 complete PhD lecture decks with 800+ slides, interactive Quarto versions with plotly charts, and full R replication packages — all managed through this multi-agent workflow.
+```
+my-submission-formatting-agent/
+├── manuscripts/          # Drop input manuscripts here (read-only)
+├── guidelines/           # Journal requirements YAML (one file per journal)
+├── outputs/              # Formatted outputs
+│   └── [journal-name]/
+│       ├── working.md                  # Normalized markdown (from ingest)
+│       ├── manuscript_formatted.md     # Formatted output
+│       ├── manuscript_formatted.docx   # Formatted Word document
+│       ├── compliance_checklist.md     # PASS/WARN/FAIL per requirement
+│       └── formatting_report.md        # Full change summary
+├── scripts/
+│   ├── ingest.py          # Manuscript → markdown (pandoc wrapper)
+│   ├── export_docx.py     # Markdown → docx (pandoc wrapper)
+│   └── quality_score.py   # Compliance scoring (--rubric manuscript)
+├── templates/
+│   ├── reference.docx              # Pandoc docx reference template
+│   └── journal-requirements.yml   # Schema template for new journals
+└── .claude/               # Rules, skills, agents, hooks
+```
 
 ---
 
 ## License
 
-MIT License. Use freely for teaching, research, or any academic purpose.
+MIT License. Use freely for research or any academic purpose.
