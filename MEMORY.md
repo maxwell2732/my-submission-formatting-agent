@@ -70,3 +70,17 @@ When a mistake is corrected, append a `[LEARN:category]` entry below.
 [LEARN:meta] Dogfooding principles must be enforced: plan-first, spec-then-plan, quality gates, session logs → we follow our own guide.
 
 [LEARN:meta] Template development work (building infrastructure, docs) doesn't create session logs in quality_reports/ → those are for user work (slides, analysis), not meta-work. Keeps template clean for users who fork.
+
+## Manuscript Formatting Agent
+
+[LEARN:manuscript] Core invariant: NEVER alter scientific content. Only reformat structure, headings, section order, abstract layout. Flag any ambiguous case for author review.
+
+[LEARN:manuscript] Draft markers (`<!-- DRAFT -->` / `<!-- END DRAFT -->`) are mandatory for all auto-drafted content. Compliance checker counts unpaired markers as FAIL.
+
+[LEARN:manuscript] Ingest pipeline: manuscripts/ (read-only) → scripts/ingest.py → outputs/[journal]/working.md → format → outputs/[journal]/manuscript_formatted.md + .docx.
+
+[LEARN:manuscript] guidelines/[journal].yml is the single source of truth for journal requirements. All compliance checks load from this file. Parse via /parse-guidelines before formatting.
+
+[LEARN:manuscript] quality_score.py supports --rubric manuscript for compliance scoring. Use --journal [name] to load guidelines for section-order and word-count checks.
+
+[LEARN:manuscript] Word count violations are WARN not FAIL — authors decide what to cut. Never auto-delete content to meet limits.

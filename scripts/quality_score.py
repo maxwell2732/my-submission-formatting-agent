@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """
-Quality Scoring System for Academic Course Materials
+Quality Scoring System for Academic Manuscripts and Course Materials
 
 Calculates objective quality scores (0-100) based on defined rubrics.
 Enforces quality gates: 80 (commit), 90 (PR), 95 (excellence).
 
 Usage:
+    # Manuscript compliance scoring
+    python scripts/quality_score.py outputs/journal/manuscript_formatted.md --rubric manuscript
+    python scripts/quality_score.py outputs/journal/manuscript_formatted.md --rubric manuscript --journal lancet-eb
+
+    # Legacy course material scoring
     python scripts/quality_score.py Quarto/Lecture6_Topic.qmd
-    python scripts/quality_score.py Quarto/Lecture6_Topic.qmd --summary
-    python scripts/quality_score.py Quarto/*.qmd
     python scripts/quality_score.py Slides/Lecture01_Topic.tex
     python scripts/quality_score.py scripts/R/Lecture06_simulations.R
 """
@@ -17,9 +20,15 @@ import sys
 import argparse
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 import re
 import json
+
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
 
 # ==============================================================================
 # SCORING RUBRIC (from .claude/rules/quality-gates.md)
@@ -76,6 +85,25 @@ BEAMER_RUBRIC = {
     },
     'minor': {
         'font_size_reduction': {'points': 1},
+    }
+}
+
+MANUSCRIPT_RUBRIC = {
+    'critical': {
+        'sections_out_of_order': {'points': 20},
+        'abstract_missing_required_sections': {'points': 20},
+        'missing_required_section': {'points': 15},    # per section
+        'unclosed_draft_marker': {'points': 10},       # per instance
+    },
+    'major': {
+        'word_count_over_limit': {'points': 10},
+        'heading_style_noncompliant': {'points': 5},
+        'special_requirement_missing': {'points': 5},  # per item
+        'citation_format_inconsistency': {'points': 5},
+    },
+    'minor': {
+        'heading_case_inconsistency': {'points': 2},
+        'formatting_artifact': {'points': 1},
     }
 }
 
@@ -364,6 +392,322 @@ class IssueDetector:
 
         broken = cited_keys - bib_keys
         return list(broken)
+
+# ==============================================================================
+# MANUSCRIPT COMPLIANCE SCORER
+# ==============================================================================
+
+class ManuscriptScorer:
+    """Score manuscript compliance against journal requirements."""
+
+    def __init__(self, filepath: Path, journal: Optional[str] = None, verbose: bool = False):
+        self.filepath = filepath
+        self.journal = journal
+        self.verbose = verbose
+        self.score = 100
+        self.issues = {'critical': [], 'major': [], 'minor': []}
+        self.auto_fail = False
+        self.guidelines = self._load_guidelines()
+
+    def _load_guidelines(self) -> Optional[Dict]:
+        """Load journal guidelines YAML if available."""
+        if not self.journal:
+            return None
+        if not YAML_AVAILABLE:
+            return None
+        yml_path = Path('guidelines') / f'{self.journal}.yml'
+        if not yml_path.exists():
+            return None
+        try:
+            with open(yml_path, encoding='utf-8') as f:
+                return yaml.safe_load(f)
+        except Exception:
+            return None
+
+    def _count_words(self, content: str) -> int:
+        """Count words in markdown, roughly excluding YAML front matter."""
+        lines = content.split('\n')
+        # Strip YAML front matter
+        if lines and lines[0].strip() == '---':
+            end = next((i for i, l in enumerate(lines[1:], 1) if l.strip() == '---'), None)
+            if end:
+                lines = lines[end + 1:]
+        text = '\n'.join(lines)
+        # Remove markdown headings, links, inline code
+        text = re.sub(r'#{1,6}\s+', '', text)
+        text = re.sub(r'`[^`]+`', '', text)
+        text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
+        text = re.sub(r'<!--.*?-->', '', text, flags=re.DOTALL)
+        return len(text.split())
+
+    def _get_headings(self, content: str) -> List[Dict]:
+        """Extract all markdown headings with level, text, and line number."""
+        headings = []
+        for i, line in enumerate(content.split('\n'), 1):
+            m = re.match(r'^(#{1,6})\s+(.+)', line)
+            if m:
+                headings.append({
+                    'level': len(m.group(1)),
+                    'text': m.group(2).strip(),
+                    'line': i,
+                })
+        return headings
+
+    def _check_draft_markers(self, content: str) -> Tuple[int, int]:
+        """Count open and close draft markers. Returns (open_count, close_count)."""
+        open_count = len(re.findall(r'<!--\s*DRAFT', content, re.IGNORECASE))
+        close_count = len(re.findall(r'<!--\s*END DRAFT', content, re.IGNORECASE))
+        return open_count, close_count
+
+    def _check_section_order(self, headings: List[Dict]) -> bool:
+        """Check if H1 sections are in the order required by guidelines."""
+        if not self.guidelines:
+            return True
+        required = self.guidelines.get('sections_required', [])
+        if not required:
+            return True
+        # Get manuscript H1 headings
+        h1_texts = [h['text'].lower() for h in headings if h['level'] == 1]
+        required_names = [r['name'].lower() for r in required if r.get('required', True)]
+        # Check that required sections appear in the right relative order
+        last_pos = -1
+        for req in required_names:
+            matches = [i for i, t in enumerate(h1_texts) if req in t or t in req]
+            if matches:
+                pos = matches[0]
+                if pos < last_pos:
+                    return False
+                last_pos = pos
+        return True
+
+    def _find_missing_sections(self, headings: List[Dict]) -> List[str]:
+        """Return list of required sections missing from the manuscript."""
+        if not self.guidelines:
+            return []
+        required = self.guidelines.get('sections_required', [])
+        h1_texts = [h['text'].lower() for h in headings if h['level'] == 1]
+        missing = []
+        for r in required:
+            if not r.get('required', True):
+                continue
+            name = r['name'].lower()
+            found = any(name in t or t in name for t in h1_texts)
+            if not found:
+                missing.append(r['name'])
+        return missing
+
+    def _check_heading_style(self, headings: List[Dict]) -> List[str]:
+        """Return list of non-compliant headings per guidelines style."""
+        if not self.guidelines:
+            return []
+        style = self.guidelines.get('headings', {}).get('style', '').lower()
+        if not style:
+            return []
+        noncompliant = []
+        for h in headings:
+            text = h['text']
+            if style == 'sentence case':
+                # First word should be capitalized, rest (except proper nouns) lowercase
+                words = text.split()
+                if len(words) > 1:
+                    # Check if any word after position 0 is incorrectly capitalized
+                    # (heuristic: flag if >1 subsequent word is Title-cased and not a known proper noun)
+                    titled_after_first = sum(
+                        1 for w in words[1:]
+                        if w and w[0].isupper() and w.lower() not in ('a', 'an', 'the', 'and', 'or')
+                    )
+                    if titled_after_first >= 2:
+                        noncompliant.append(text)
+            elif style == 'title case':
+                minor_words = {'a', 'an', 'the', 'and', 'but', 'or', 'for', 'nor',
+                               'on', 'at', 'to', 'by', 'in', 'of', 'up', 'as'}
+                words = text.split()
+                for j, w in enumerate(words):
+                    clean = re.sub(r'[^a-zA-Z]', '', w)
+                    if j > 0 and clean.lower() in minor_words:
+                        continue
+                    if clean and not clean[0].isupper():
+                        noncompliant.append(text)
+                        break
+        return noncompliant
+
+    def score_manuscript(self) -> Dict:
+        """Score manuscript compliance."""
+        content = self.filepath.read_text(encoding='utf-8')
+        headings = self._get_headings(content)
+
+        # 1. Draft markers
+        open_m, close_m = self._check_draft_markers(content)
+        unclosed = open_m - close_m
+        if unclosed > 0:
+            for _ in range(unclosed):
+                self.issues['critical'].append({
+                    'type': 'unclosed_draft_marker',
+                    'description': 'Unclosed <!-- DRAFT --> marker',
+                    'details': 'Every <!-- DRAFT --> must have a matching <!-- END DRAFT -->',
+                    'points': MANUSCRIPT_RUBRIC['critical']['unclosed_draft_marker']['points']
+                })
+                self.score -= MANUSCRIPT_RUBRIC['critical']['unclosed_draft_marker']['points']
+        elif open_m > 0:
+            # Paired draft markers: warn (expected during iteration)
+            self.issues['minor'].append({
+                'type': 'draft_markers_present',
+                'description': f'{open_m} DRAFT section(s) require author review',
+                'details': 'Search for <!-- DRAFT --> in the output file',
+                'points': 0
+            })
+
+        # 2. Missing required sections (only if guidelines loaded)
+        missing = self._find_missing_sections(headings)
+        for section in missing:
+            pts = MANUSCRIPT_RUBRIC['critical']['missing_required_section']['points']
+            self.issues['critical'].append({
+                'type': 'missing_required_section',
+                'description': f'Missing required section: {section}',
+                'details': 'Journal requires this section. Add or auto-draft it.',
+                'points': pts
+            })
+            self.score -= pts
+
+        # 3. Section order
+        if not self._check_section_order(headings):
+            pts = MANUSCRIPT_RUBRIC['critical']['sections_out_of_order']['points']
+            self.issues['critical'].append({
+                'type': 'sections_out_of_order',
+                'description': 'Sections not in journal-required order',
+                'details': f"Check guidelines/{self.journal}.yml sections_required for correct order",
+                'points': pts
+            })
+            self.score -= pts
+
+        # 4. Heading style
+        noncompliant_headings = self._check_heading_style(headings)
+        if len(noncompliant_headings) >= 3:
+            pts = MANUSCRIPT_RUBRIC['major']['heading_style_noncompliant']['points']
+            self.issues['major'].append({
+                'type': 'heading_style_noncompliant',
+                'description': f'{len(noncompliant_headings)} headings not in required style',
+                'details': f"Required: {self.guidelines.get('headings', {}).get('style', 'unknown')}. "
+                           f"Examples: {noncompliant_headings[:2]}",
+                'points': pts
+            })
+            self.score -= pts
+        elif len(noncompliant_headings) > 0:
+            pts = MANUSCRIPT_RUBRIC['minor']['heading_case_inconsistency']['points']
+            self.issues['minor'].append({
+                'type': 'heading_case_inconsistency',
+                'description': f'{len(noncompliant_headings)} headings with minor style issue',
+                'details': f"Examples: {noncompliant_headings[:2]}",
+                'points': pts * len(noncompliant_headings)
+            })
+            self.score -= pts * len(noncompliant_headings)
+
+        # 5. Word count (if guidelines specify)
+        if self.guidelines:
+            total_limit = (self.guidelines.get('word_limit') or {}).get('total')
+            if total_limit:
+                word_count = self._count_words(content)
+                if word_count > total_limit * 1.10:
+                    pts = MANUSCRIPT_RUBRIC['major']['word_count_over_limit']['points']
+                    over_pct = int((word_count - total_limit) / total_limit * 100)
+                    self.issues['major'].append({
+                        'type': 'word_count_over_limit',
+                        'description': f'Word count {word_count} exceeds limit {total_limit} (+{over_pct}%)',
+                        'details': 'Author should trim content before submission',
+                        'points': pts
+                    })
+                    self.score -= pts
+
+        # 6. Formatting artifacts
+        artifacts = re.findall(r'\\[a-zA-Z]+\{', content)
+        if len(artifacts) > 5:
+            pts = MANUSCRIPT_RUBRIC['minor']['formatting_artifact']['points']
+            self.issues['minor'].append({
+                'type': 'formatting_artifact',
+                'description': f'{len(artifacts)} possible LaTeX remnants in output',
+                'details': f"Examples: {list(set(artifacts))[:3]}",
+                'points': pts
+            })
+            self.score -= pts
+
+        self.score = max(0, self.score)
+        return self._generate_report()
+
+    def _generate_report(self) -> Dict:
+        """Generate quality score report."""
+        if self.auto_fail:
+            status = 'FAIL'
+        elif self.score >= THRESHOLDS['excellence']:
+            status = 'EXCELLENCE'
+        elif self.score >= THRESHOLDS['pr']:
+            status = 'PR_READY'
+        elif self.score >= THRESHOLDS['commit']:
+            status = 'COMMIT_READY'
+        else:
+            status = 'BLOCKED'
+
+        counts = {k: len(v) for k, v in self.issues.items()}
+        counts['total'] = sum(counts.values())
+
+        return {
+            'filepath': str(self.filepath),
+            'score': self.score,
+            'status': status,
+            'auto_fail': self.auto_fail,
+            'rubric': 'manuscript',
+            'journal': self.journal,
+            'issues': {**self.issues, 'counts': counts},
+            'thresholds': THRESHOLDS,
+        }
+
+    def print_report(self, summary_only: bool = False) -> None:
+        """Print formatted compliance report."""
+        report = self._generate_report()
+        print(f"\n# Manuscript Compliance Score: {self.filepath.name}\n")
+
+        status_label = {
+            'EXCELLENCE': '[EXCELLENCE]', 'PR_READY': '[PASS]',
+            'COMMIT_READY': '[PASS]', 'BLOCKED': '[BLOCKED]', 'FAIL': '[FAIL]'
+        }
+        print(f"## Overall Score: {report['score']}/100 {status_label.get(report['status'], '')}")
+        if self.journal:
+            print(f"**Journal:** {self.journal}")
+        if not self.guidelines and self.journal:
+            print(f"**Note:** guidelines/{self.journal}.yml not found — only generic checks run")
+        elif not self.journal:
+            print("**Note:** No journal specified — only generic checks run (use --journal [name])")
+
+        if summary_only:
+            counts = report['issues']['counts']
+            print(f"\n**Total issues:** {counts['total']} "
+                  f"({counts['critical']} critical, {counts['major']} major, {counts['minor']} minor)")
+            return
+
+        for severity in ('critical', 'major'):
+            issues = report['issues'][severity]
+            label = 'MUST FIX' if severity == 'critical' else 'SHOULD FIX'
+            print(f"\n## {severity.title()} Issues ({label}): {len(issues)}")
+            if not issues:
+                print("None")
+            for i, issue in enumerate(issues, 1):
+                pts = f" (-{issue['points']} points)" if issue.get('points') else ""
+                print(f"{i}. **{issue['description']}**{pts}")
+                print(f"   - {issue['details']}")
+
+        if self.verbose:
+            issues = report['issues']['minor']
+            print(f"\n## Minor Issues: {len(issues)}")
+            for i, issue in enumerate(issues, 1):
+                print(f"{i}. {issue['description']}")
+
+        if report['status'] == 'BLOCKED':
+            print(f"\n## Action Required")
+            print(f"Score {report['score']}/100 is below commit threshold ({THRESHOLDS['commit']}).")
+            print("Fix critical issues above and re-run.")
+        elif report['status'] == 'COMMIT_READY':
+            gap = THRESHOLDS['pr'] - report['score']
+            print(f"\n**Status:** Ready to commit. Need +{gap} points for PR/delivery threshold.")
+
 
 # ==============================================================================
 # QUALITY SCORER
@@ -672,31 +1016,28 @@ class QualityScorer:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Calculate quality scores for course materials',
+        description='Calculate quality scores for manuscripts and course materials',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Score a single Quarto file
+  # Score manuscript compliance (recommended)
+  python scripts/quality_score.py outputs/lancet/manuscript_formatted.md --rubric manuscript
+  python scripts/quality_score.py outputs/lancet/manuscript_formatted.md --rubric manuscript --journal lancet-eb
+
+  # Legacy: Score Quarto/Beamer/R files
   python scripts/quality_score.py Quarto/Lecture6_Topic.qmd
-
-  # Score multiple files
-  python scripts/quality_score.py Quarto/*.qmd
-
-  # Score a Beamer/LaTeX file
   python scripts/quality_score.py Slides/Lecture01_Topic.tex
-
-  # Score an R script
   python scripts/quality_score.py scripts/R/Lecture06_simulations.R
 
-  # Summary only (no detailed issues)
-  python scripts/quality_score.py Quarto/Lecture6.qmd --summary
+  # Summary only
+  python scripts/quality_score.py outputs/lancet/manuscript.md --rubric manuscript --summary
 
-  # Verbose output (include minor issues)
-  python scripts/quality_score.py Quarto/Lecture6.qmd --verbose
+  # JSON output
+  python scripts/quality_score.py outputs/lancet/manuscript.md --rubric manuscript --json
 
 Quality Thresholds:
-  80/100 = Commit threshold (blocks if below)
-  90/100 = PR threshold (warning if below)
+  80/100 = Commit threshold
+  90/100 = PR / delivery threshold
   95/100 = Excellence (aspirational)
 
 Exit Codes:
@@ -707,6 +1048,10 @@ Exit Codes:
     )
 
     parser.add_argument('filepaths', type=Path, nargs='+', help='Path(s) to file(s) to score')
+    parser.add_argument('--rubric', choices=['manuscript', 'auto'], default='auto',
+                        help='Scoring rubric: "manuscript" for compliance scoring, "auto" to detect from extension')
+    parser.add_argument('--journal', type=str, default=None,
+                        help='Journal name (loads guidelines/[journal].yml for compliance checks)')
     parser.add_argument('--summary', action='store_true', help='Show summary only')
     parser.add_argument('--verbose', action='store_true', help='Show all issues including minor')
     parser.add_argument('--json', action='store_true', help='Output as JSON')
@@ -723,24 +1068,47 @@ Exit Codes:
             continue
 
         try:
-            scorer = QualityScorer(filepath, verbose=args.verbose)
+            # Determine rubric
+            use_manuscript = (
+                args.rubric == 'manuscript' or
+                (args.rubric == 'auto' and filepath.suffix == '.md' and
+                 str(filepath).startswith('outputs'))
+            )
 
-            if filepath.suffix == '.qmd':
-                report = scorer.score_quarto()
-            elif filepath.suffix == '.R':
-                report = scorer.score_r_script()
-            elif filepath.suffix == '.tex':
-                report = scorer.score_beamer()
+            if use_manuscript:
+                scorer = ManuscriptScorer(filepath, journal=args.journal, verbose=args.verbose)
+                report = scorer.score_manuscript()
+                if not args.json:
+                    scorer.print_report(summary_only=args.summary)
             else:
-                print(f"Error: Unsupported file type: {filepath.suffix}")
-                continue
+                scorer = QualityScorer(filepath, verbose=args.verbose)
+                if filepath.suffix == '.qmd':
+                    report = scorer.score_quarto()
+                elif filepath.suffix == '.R':
+                    report = scorer.score_r_script()
+                elif filepath.suffix == '.tex':
+                    report = scorer.score_beamer()
+                elif filepath.suffix == '.md':
+                    # Plain markdown without --rubric manuscript: use manuscript scorer
+                    ms = ManuscriptScorer(filepath, journal=args.journal, verbose=args.verbose)
+                    report = ms.score_manuscript()
+                    if not args.json:
+                        ms.print_report(summary_only=args.summary)
+                    results.append(report)
+                    if report['score'] < THRESHOLDS['commit']:
+                        exit_code = max(exit_code, 1)
+                    continue
+                else:
+                    print(f"Error: Unsupported file type: {filepath.suffix}")
+                    print("Use --rubric manuscript for .md files")
+                    continue
+
+                if not args.json:
+                    scorer.print_report(summary_only=args.summary)
 
             results.append(report)
 
-            if not args.json:
-                scorer.print_report(summary_only=args.summary)
-
-            if report['auto_fail']:
+            if report.get('auto_fail'):
                 exit_code = max(exit_code, 2)
             elif report['score'] < THRESHOLDS['commit']:
                 exit_code = max(exit_code, 1)

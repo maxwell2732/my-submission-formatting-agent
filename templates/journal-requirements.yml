@@ -1,0 +1,185 @@
+# Journal Requirements Template
+# Copy this file to guidelines/[journal-name].yml and fill in the fields.
+# Run /parse-guidelines to auto-populate from a URL, or edit manually.
+#
+# Schema documentation:
+#   null    = field not specified in journal guidelines (leave as null)
+#   true    = yes / required
+#   false   = no / not required
+#
+# Fields marked [REQUIRED] must be filled for compliance scoring to work.
+
+# ------------------------------------------------------------------
+# Identification [REQUIRED]
+# ------------------------------------------------------------------
+journal: "Journal Name"           # Full journal name
+abbreviation: "short-name"        # Lowercase, hyphenated (used for directory names)
+url: "https://..."                # URL to author guidelines page
+extracted_date: "YYYY-MM-DD"      # When this was last checked / updated
+notes: ""                         # Any caveats about this extraction
+
+# ------------------------------------------------------------------
+# Required Sections [REQUIRED]
+# List sections in the ORDER the journal requires them.
+# ------------------------------------------------------------------
+sections_required:
+  - name: "Abstract"
+    level: 1
+    position: 0           # 0 = before Introduction
+    required: true
+    word_limit: null
+    notes: ""
+
+  - name: "Introduction"
+    level: 1
+    position: 1
+    required: true
+    word_limit: null
+    notes: ""
+
+  - name: "Methods"
+    level: 1
+    position: 2
+    required: true
+    word_limit: null
+    notes: ""
+
+  - name: "Results"
+    level: 1
+    position: 3
+    required: true
+    word_limit: null
+    notes: ""
+
+  - name: "Discussion"
+    level: 1
+    position: 4
+    required: true
+    word_limit: null
+    notes: ""
+
+  - name: "Conclusion"
+    level: 1
+    position: 5
+    required: false
+    word_limit: null
+    notes: "Some journals fold this into Discussion"
+
+  - name: "Acknowledgements"
+    level: 1
+    position: 6
+    required: false
+    word_limit: null
+    notes: ""
+
+  - name: "References"
+    level: 1
+    position: 7
+    required: true
+    word_limit: null
+    notes: ""
+
+# ------------------------------------------------------------------
+# Abstract [REQUIRED if journal uses structured abstract]
+# ------------------------------------------------------------------
+abstract:
+  structured: true                 # true = structured (with named sections)
+  structure:                       # Required abstract section headings, in order
+    - "Background"
+    - "Methods"
+    - "Results"
+    - "Conclusions"
+  word_limit: 250                  # null if not specified
+  character_limit: null
+  notes: ""
+
+# ------------------------------------------------------------------
+# Headings
+# ------------------------------------------------------------------
+headings:
+  style: "sentence case"           # "sentence case" or "title case"
+  max_levels: 3                    # Maximum heading depth allowed
+  notes: ""
+
+# ------------------------------------------------------------------
+# Word / Length Limits
+# ------------------------------------------------------------------
+word_limit:
+  total: 3500                      # null if not specified
+  excludes: "abstract, references, tables, figure legends"
+  character_limit: null
+  notes: ""
+
+# ------------------------------------------------------------------
+# Figures
+# ------------------------------------------------------------------
+figures:
+  max_count: 5                     # null if no limit
+  format: "TIFF or EPS"
+  resolution: "300 DPI minimum"
+  max_size_mb: null
+  notes: ""
+
+# ------------------------------------------------------------------
+# Tables
+# ------------------------------------------------------------------
+tables:
+  max_count: 3                     # null if no limit
+  notes: ""
+
+# ------------------------------------------------------------------
+# References
+# ------------------------------------------------------------------
+references:
+  style: "Vancouver"               # "Vancouver", "APA", "AMA", "ACS", "NLM", etc.
+  max_count: 40                    # null if no limit
+  notes: ""
+
+# ------------------------------------------------------------------
+# Special Requirements
+# Add/remove items as needed for the specific journal.
+# ------------------------------------------------------------------
+special_requirements:
+  - name: "Data availability statement"
+    required: true
+    notes: "State where data are available or justify unavailability"
+
+  - name: "Funding statement"
+    required: true
+    notes: "List all funding sources with grant numbers"
+
+  - name: "Conflicts of interest"
+    required: true
+    notes: "Declare or state 'none' for all authors"
+
+  - name: "Ethics statement"
+    required: false
+    notes: "Required for studies involving human participants"
+
+  - name: "Author contributions"
+    required: false
+    notes: "CRediT taxonomy recommended by some journals"
+
+  - name: "Clinical trial registration"
+    required: false
+    notes: "Required if paper reports a clinical trial"
+
+# ------------------------------------------------------------------
+# Lancet-style Research in Context Box (delete if not applicable)
+# ------------------------------------------------------------------
+# research_in_context:
+#   required: true
+#   sections:
+#     - name: "Evidence before this study"
+#       word_limit: 150
+#     - name: "Added value of this study"
+#       word_limit: 100
+#     - name: "Implications of all the available evidence"
+#       word_limit: 150
+
+# ------------------------------------------------------------------
+# Cover Letter (delete if not applicable)
+# ------------------------------------------------------------------
+# cover_letter:
+#   required: true
+#   notes: "Address to Editor-in-Chief. Describe novelty and why appropriate for journal."

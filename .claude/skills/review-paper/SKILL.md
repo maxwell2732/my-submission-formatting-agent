@@ -1,8 +1,8 @@
 ---
 name: review-paper
-description: Comprehensive manuscript review covering argument structure, econometric specification, citation completeness, and potential referee objections
+description: Comprehensive manuscript review covering argument structure, methodology, citation completeness, writing quality, and potential referee objections. Works with .docx, .tex, .pdf, and .md manuscripts.
 disable-model-invocation: true
-argument-hint: "[paper filename in master_supporting_docs/ or path to .tex/.pdf]"
+argument-hint: "[paper filename in manuscripts/ or master_supporting_docs/, or full path]"
 allowed-tools: ["Read", "Grep", "Glob", "Write", "Task"]
 ---
 
@@ -10,7 +10,7 @@ allowed-tools: ["Read", "Grep", "Glob", "Write", "Task"]
 
 Produce a thorough, constructive review of an academic manuscript — the kind of report a top-journal referee would write.
 
-**Input:** `$ARGUMENTS` — path to a paper (.tex, .pdf, or .qmd), or a filename in `master_supporting_docs/`.
+**Input:** `$ARGUMENTS` — path to a paper (.docx, .tex, .pdf, .md), or a filename in `manuscripts/` or `master_supporting_docs/`.
 
 ---
 
@@ -18,10 +18,12 @@ Produce a thorough, constructive review of an academic manuscript — the kind o
 
 1. **Locate and read the manuscript.** Check:
    - Direct path from `$ARGUMENTS`
+   - `manuscripts/$ARGUMENTS`
    - `master_supporting_docs/supporting_papers/$ARGUMENTS`
+   - `outputs/` for formatted versions
    - Glob for partial matches
 
-2. **Read the full paper** end-to-end. For long PDFs, read in chunks (5 pages at a time).
+2. **Read the full paper** end-to-end. For long documents, read in sections.
 
 3. **Evaluate across 6 dimensions** (see below).
 
@@ -42,19 +44,18 @@ Produce a thorough, constructive review of an academic manuscript — the kind o
 - Are the conclusions supported by the evidence?
 - Are limitations acknowledged?
 
-### 2. Identification Strategy
-- Is the causal claim credible?
-- What are the key identifying assumptions? Are they stated explicitly?
-- Are there threats to identification (omitted variables, reverse causality, measurement error)?
-- Are robustness checks adequate?
-- Is the estimator appropriate for the research design?
+### 2. Study Design and Methods
+- Is the study design appropriate for the research question?
+- Are key methodological assumptions stated explicitly?
+- Are there threats to validity (confounding, bias, measurement error)?
+- Are statistical methods appropriate?
+- Is sample size / power discussed?
 
-### 3. Econometric Specification
-- Correct standard errors (clustered? robust? bootstrap?)?
-- Appropriate functional form?
-- Sample selection issues?
-- Multiple testing concerns?
-- Are point estimates economically meaningful (not just statistically significant)?
+### 3. Results and Interpretation
+- Are results clearly reported with appropriate statistics?
+- Are figures and tables well-designed and self-contained?
+- Is interpretation appropriate (not over-claiming)?
+- Are negative or null results handled appropriately?
 
 ### 4. Literature Positioning
 - Are the key papers cited?
@@ -65,15 +66,15 @@ Produce a thorough, constructive review of an academic manuscript — the kind o
 ### 5. Writing Quality
 - Clarity and concision
 - Academic tone
-- Consistent notation throughout
+- Consistent terminology throughout
 - Abstract effectively summarizes the paper
-- Tables and figures are self-contained (clear labels, notes, sources)
+- Tables and figures have clear labels, notes, sources
 
-### 6. Presentation
-- Are tables and figures well-designed?
-- Is notation consistent throughout?
-- Are there any typos, grammatical errors, or formatting issues?
+### 6. Formatting and Presentation
 - Is the paper the right length for the contribution?
+- Is notation / terminology consistent throughout?
+- Are there any typos, grammatical errors, or formatting issues?
+- Are headings appropriate for the journal type?
 
 ---
 
@@ -101,10 +102,10 @@ Produce a thorough, constructive review of an academic manuscript — the kind o
 ## Major Concerns
 
 ### MC1: [Title]
-- **Dimension:** [Identification / Econometrics / Argument / Literature / Writing / Presentation]
+- **Dimension:** [Argument / Methods / Results / Literature / Writing / Presentation]
 - **Issue:** [Specific description]
 - **Suggestion:** [How to address it]
-- **Location:** [Section/page/table if applicable]
+- **Location:** [Section/page if applicable]
 
 [Repeat for each major concern]
 
@@ -128,15 +129,15 @@ These are the tough questions a top referee would likely raise:
 
 ## Specific Comments
 
-[Line-by-line or section-by-section comments, if any]
+[Section-by-section comments, if any]
 
-## Summary Statistics
+## Summary Ratings
 
 | Dimension | Rating (1-5) |
 |-----------|-------------|
 | Argument Structure | [N] |
-| Identification | [N] |
-| Econometrics | [N] |
+| Study Design / Methods | [N] |
+| Results / Interpretation | [N] |
 | Literature | [N] |
 | Writing | [N] |
 | Presentation | [N] |
@@ -148,8 +149,8 @@ These are the tough questions a top referee would likely raise:
 ## Principles
 
 - **Be constructive.** Every criticism should come with a suggestion.
-- **Be specific.** Reference exact sections, equations, tables.
-- **Think like a referee at a top-5 journal.** What would make them reject?
+- **Be specific.** Reference exact sections, tables, figures.
 - **Distinguish fatal flaws from minor issues.** Not everything is equally important.
 - **Acknowledge what's done well.** Good research deserves recognition.
 - **Do NOT fabricate details.** If you can't read a section clearly, say so.
+- **Do NOT alter scientific content.** This is a review, not an edit.

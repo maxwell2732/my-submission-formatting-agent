@@ -1,11 +1,6 @@
-# CLAUDE.MD -- Academic Project Development with Claude Code
+# CLAUDE.MD -- Manuscript Submission Formatting Agent
 
-<!-- HOW TO USE: Replace [BRACKETED PLACEHOLDERS] with your project info.
-     Customize Beamer environments and CSS classes for your theme.
-     Keep this file under ~150 lines — Claude loads it every session.
-     See the guide at docs/workflow-guide.html for full documentation. -->
-
-**Project:** [YOUR PROJECT NAME]
+**Project:** Manuscript Submission Formatting Agent
 **Institution:** [YOUR INSTITUTION]
 **Branch:** main
 
@@ -14,8 +9,9 @@
 ## Core Principles
 
 - **Plan first** -- enter plan mode before non-trivial tasks; save plans to `quality_reports/plans/`
-- **Verify after** -- compile/render and confirm output at the end of every task
-- **Single source of truth** -- Beamer `.tex` is authoritative; Quarto `.qmd` derives from it
+- **Verify after** -- run ingest + export and confirm outputs at end of every task
+- **Never alter scientific content** -- reformat only; flag any content-touching changes for author review
+- **Draft markers required** -- auto-drafted sections MUST be tagged `<!-- DRAFT: requires author review -->`
 - **Quality gates** -- nothing ships below 80/100
 - **[LEARN] tags** -- when corrected, save `[LEARN:category] wrong → right` to MEMORY.md
 
@@ -24,20 +20,25 @@
 ## Folder Structure
 
 ```
-[YOUR-PROJECT]/
-├── CLAUDE.MD                    # This file
+my-submission-formatting-agent/
+├── CLAUDE.md                    # This file
 ├── .claude/                     # Rules, skills, agents, hooks
 ├── Bibliography_base.bib        # Centralized bibliography
-├── Figures/                     # Figures and images
-├── Preambles/header.tex         # LaTeX headers
-├── Slides/                      # Beamer .tex files
-├── Quarto/                      # RevealJS .qmd files + theme
-├── docs/                        # GitHub Pages (auto-generated)
-├── scripts/                     # Utility scripts + R code
+├── Figures/                     # Figures and diagrams
+├── manuscripts/                 # Input manuscripts (read-only originals)
+├── guidelines/                  # Parsed journal requirements (.yml)
+├── outputs/                     # Formatted outputs per journal
+│   └── [journal-name]/
+│       ├── working.md           # Normalized markdown (working copy)
+│       ├── manuscript_formatted.docx
+│       ├── manuscript_formatted.md
+│       └── formatting_report.md
+├── docs/                        # GitHub Pages
+├── scripts/                     # ingest.py, export_docx.py, quality_score.py
 ├── quality_reports/             # Plans, session logs, merge reports
-├── explorations/                # Research sandbox (see rules)
-├── templates/                   # Session log, quality report templates
-└── master_supporting_docs/      # Papers and existing slides
+├── explorations/                # Research sandbox
+├── templates/                   # reference.docx, journal-requirements.yml, etc.
+└── master_supporting_docs/      # Reference papers
 ```
 
 ---
@@ -45,17 +46,19 @@
 ## Commands
 
 ```bash
-# LaTeX (3-pass, XeLaTeX only)
-cd Slides && TEXINPUTS=../Preambles:$TEXINPUTS xelatex -interaction=nonstopmode file.tex
-BIBINPUTS=..:$BIBINPUTS bibtex file
-TEXINPUTS=../Preambles:$TEXINPUTS xelatex -interaction=nonstopmode file.tex
-TEXINPUTS=../Preambles:$TEXINPUTS xelatex -interaction=nonstopmode file.tex
+# Ingest manuscript → normalized markdown
+python scripts/ingest.py manuscripts/paper.docx outputs/journal/working.md
+python scripts/ingest.py manuscripts/paper.tex  outputs/journal/working.md
+python scripts/ingest.py manuscripts/paper.pdf  outputs/journal/working.md
 
-# Deploy Quarto to GitHub Pages
-./scripts/sync_to_docs.sh LectureN
+# Export markdown → formatted docx
+python scripts/export_docx.py outputs/journal/working.md outputs/journal/manuscript_formatted.docx
 
-# Quality score
-python scripts/quality_score.py Quarto/file.qmd
+# Compliance quality score
+python scripts/quality_score.py outputs/journal/manuscript_formatted.md --rubric manuscript
+
+# Generate reference.docx template (run once to set up)
+pandoc --print-default-data-file reference.docx > templates/reference.docx
 ```
 
 ---
@@ -65,7 +68,7 @@ python scripts/quality_score.py Quarto/file.qmd
 | Score | Gate | Meaning |
 |-------|------|---------|
 | 80 | Commit | Good enough to save |
-| 90 | PR | Ready for deployment |
+| 90 | PR | Ready for delivery |
 | 95 | Excellence | Aspirational |
 
 ---
@@ -74,60 +77,39 @@ python scripts/quality_score.py Quarto/file.qmd
 
 | Command | What It Does |
 |---------|-------------|
-| `/compile-latex [file]` | 3-pass XeLaTeX + bibtex |
-| `/deploy [LectureN]` | Render Quarto + sync to docs/ |
-| `/extract-tikz [LectureN]` | TikZ → PDF → SVG |
-| `/proofread [file]` | Grammar/typo/overflow review |
-| `/visual-audit [file]` | Slide layout audit |
-| `/pedagogy-review [file]` | Narrative, notation, pacing review |
-| `/review-r [file]` | R code quality review |
-| `/qa-quarto [LectureN]` | Adversarial Quarto vs Beamer QA |
-| `/slide-excellence [file]` | Combined multi-agent review |
-| `/translate-to-quarto [file]` | Beamer → Quarto translation |
-| `/validate-bib` | Cross-reference citations |
-| `/devils-advocate` | Challenge slide design |
-| `/create-lecture` | Full lecture creation |
-| `/commit [msg]` | Stage, commit, PR, merge |
+| `/parse-guidelines [name] [URL]` | Extract journal requirements → guidelines/[name].yml |
+| `/format-manuscript [file] [journal]` | Full formatting pipeline (ingest → reformat → export) |
+| `/validate-compliance [file] [journal]` | Standalone compliance check on formatted output |
+| `/generate-report [journal]` | Generate formatting_report.md with before/after diff |
+| `/proofread [file]` | Grammar/typo/consistency review |
+| `/review-paper [file]` | Substantive manuscript review |
+| `/commit [msg]` | Stage, commit, push |
 | `/lit-review [topic]` | Literature search + synthesis |
 | `/research-ideation [topic]` | Research questions + strategies |
 | `/interview-me [topic]` | Interactive research interview |
-| `/review-paper [file]` | Manuscript review |
-| `/data-analysis [dataset]` | End-to-end R analysis |
+| `/validate-bib` | Cross-reference citations |
+| `/devils-advocate` | Challenge formatting decisions |
 
 ---
 
-<!-- CUSTOMIZE: Replace the example entries below with your own
-     Beamer environments and Quarto CSS classes. These are examples
-     from the original project — delete them and add yours. -->
+## Journal Requirements YAML Schema
 
-## Beamer Custom Environments
+Key fields in `guidelines/[journal].yml`:
 
-| Environment       | Effect        | Use Case       |
-|-------------------|---------------|----------------|
-| `[your-env]`      | [Description] | [When to use]  |
-
-<!-- Example entries (delete and replace with yours):
-| `keybox` | Gold background box | Key points |
-| `highlightbox` | Gold left-accent box | Highlights |
-| `definitionbox[Title]` | Blue-bordered titled box | Formal definitions |
--->
-
-## Quarto CSS Classes
-
-| Class              | Effect        | Use Case       |
-|--------------------|---------------|----------------|
-| `[.your-class]`    | [Description] | [When to use]  |
-
-<!-- Example entries (delete and replace with yours):
-| `.smaller` | 85% font | Dense content slides |
-| `.positive` | Green bold | Good annotations |
--->
+| Field | Description |
+|-------|-------------|
+| `journal` | Journal name |
+| `sections_required` | Ordered list with name, level, position, word_limit |
+| `abstract.structure` | Required abstract sections in order |
+| `headings.style` | "sentence case" or "title case" |
+| `word_limit.total` | Total word limit |
+| `references.style` | "Vancouver", "APA", "AMA", etc. |
+| `special_requirements` | List of additional requirements |
 
 ---
 
 ## Current Project State
 
-| Lecture | Beamer | Quarto | Key Content |
-|---------|--------|--------|-------------|
-| 1: [Topic] | `Lecture01_Topic.tex` | `Lecture1_Topic.qmd` | [Brief description] |
-| 2: [Topic] | `Lecture02_Topic.tex` | -- | [Brief description] |
+| Journal | Guidelines | Sample Output | Notes |
+|---------|-----------|---------------|-------|
+| [journal-name] | `guidelines/[name].yml` | `outputs/[name]/` | [Brief description] |

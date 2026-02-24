@@ -24,6 +24,21 @@ PROTECTED_PATTERNS=(
   "settings.json"
 )
 
+# Also protect original manuscripts from accidental modification.
+# Check for writes into manuscripts/ directory (full path check).
+if [[ "$FILE" == */manuscripts/* ]] && [[ "$FILE" != */manuscripts/.gitkeep ]]; then
+  echo "Protected: manuscripts/ is read-only. Work on outputs/ copies instead." >&2
+  exit 2
+fi
+
+# Protect guidelines/ YAML files from accidental overwrite
+# (allow creation of new files, block overwriting existing ones).
+if [[ "$FILE" == */guidelines/*.yml ]] && [ -f "$FILE" ]; then
+  # File already exists — confirm before overwriting
+  echo "Warning: $FILE already exists. Re-running /parse-guidelines will overwrite it." >&2
+  # Allow (exit 0) — just warn. User approved via skill invocation.
+fi
+
 BASENAME=$(basename "$FILE")
 for PATTERN in "${PROTECTED_PATTERNS[@]}"; do
   if [[ "$BASENAME" == "$PATTERN" ]]; then
