@@ -6,6 +6,8 @@ A Claude Code workflow for reformatting research manuscripts to meet journal aut
 
 You provide a manuscript (.docx, .tex, or .pdf) and a journal's author guidelines URL. Claude parses the requirements, restructures the manuscript to comply, auto-drafts any missing required sections (marked as drafts for author review), and delivers a formatted `.docx` + `.md` with a full formatting report.
 
+> **Live example:** See [`outputs/ajare/`](outputs/ajare/) for a real formatting run — a climate economics manuscript reformatted for the *Australian Journal of Agricultural and Resource Economics* (AJARE), including the [compliance checklist](outputs/ajare/compliance_checklist.md) and [formatting report](outputs/ajare/formatting_report.md).
+
 ---
 
 ## Quick Start
@@ -21,24 +23,27 @@ claude
 ### 2. Set Up a Journal (one-time per journal)
 
 ```
-/parse-guidelines lancet-eb https://www.thelancet.com/pb/assets/raw/Lancet/authors/lancet-information-for-authors.pdf
+/parse-guidelines ajare https://onlinelibrary.wiley.com/page/journal/14678489/homepage/forauthors.html
 ```
 
-This fetches the author guidelines and saves structured requirements to `guidelines/lancet-eb.yml`.
+This fetches the author guidelines and saves structured requirements to `guidelines/ajare.yml`.
+
+> **Tip:** If the journal's website blocks automated access (403), just paste the guidelines text when prompted — Claude will extract requirements from the pasted content instead.
 
 ### 3. Format a Manuscript
 
 Drop your manuscript into `manuscripts/`, then:
 
 ```
-/format-manuscript manuscripts/paper.docx lancet-eb
+/format-manuscript manuscripts/paper.docx ajare
 ```
 
 Claude will ingest the manuscript, analyze its structure, reformat it to comply with the journal's requirements, and deliver:
 
-- `outputs/lancet-eb/manuscript_formatted.docx` — ready for submission
-- `outputs/lancet-eb/manuscript_formatted.md` — markdown version for editing
-- `outputs/lancet-eb/formatting_report.md` — full summary of every change made
+- `outputs/ajare/manuscript_formatted.docx` — ready for submission
+- `outputs/ajare/manuscript_formatted.md` — markdown version for editing
+- `outputs/ajare/compliance_checklist.md` — PASS/WARN/FAIL for every requirement
+- `outputs/ajare/formatting_report.md` — full summary of every change made
 
 ---
 
