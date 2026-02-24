@@ -6,7 +6,7 @@ A Claude Code workflow for reformatting research manuscripts to meet journal aut
 
 You provide a manuscript (.docx, .tex, or .pdf) and a journal's author guidelines URL. Claude parses the requirements, restructures the manuscript to comply, auto-drafts any missing required sections (marked as drafts for author review), and delivers a formatted `.docx` + `.md` with a full formatting report.
 
-> **Live example:** See [`outputs/ajare/`](outputs/ajare/) for a real formatting run — a climate economics manuscript reformatted for the *Australian Journal of Agricultural and Resource Economics* (AJARE), including the [compliance checklist](outputs/ajare/compliance_checklist.md) and [formatting report](outputs/ajare/formatting_report.md).
+> **Privacy:** `manuscripts/` and `outputs/` are gitignored — your manuscripts and formatted files are never pushed to GitHub. They live only on your local machine.
 
 ---
 

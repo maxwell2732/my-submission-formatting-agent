@@ -53,3 +53,7 @@ Thumbs.db
 # Output artifacts — uncomment lines below based on your preference
 # *.rds
 # output/**/*.rds
+
+# Manuscript privacy — never push manuscripts or formatted outputs to GitHub
+manuscripts/
+outputs/
