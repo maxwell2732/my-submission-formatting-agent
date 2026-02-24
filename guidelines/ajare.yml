@@ -1,0 +1,143 @@
+journal: "Australian Journal of Agricultural and Resource Economics"
+abbreviation: "ajare"
+url: "https://onlinelibrary.wiley.com/page/journal/14678489/homepage/forauthors.html"
+extracted_date: "2026-02-24"
+notes: "Free Format submission — references do not need reformatting (handled by typesetter). Double-anonymised peer review: title page must be separate from main manuscript."
+
+sections_required:
+  - name: "Abstract"
+    level: 1
+    position: 1
+    required: true
+    word_limit: null
+    notes: "Structured: intro/methods/results/conclusion"
+
+  - name: "Plain Language Summary"
+    level: 1
+    position: 2
+    required: false
+    word_limit: 200
+    notes: "Optional but encouraged. Single paragraph, no jargon. Goes below abstract."
+
+  - name: "Keywords"
+    level: 1
+    position: 3
+    required: true
+    word_limit: null
+    notes: "Up to seven keywords"
+
+  - name: "Introduction"
+    level: 1
+    position: 4
+    required: true
+    word_limit: null
+    notes: ""
+
+  - name: "Materials and Methods"
+    level: 1
+    position: 5
+    required: true
+    word_limit: null
+    notes: "Also acceptable: 'Methods', 'Methodology', 'Data and Methods'"
+
+  - name: "Results"
+    level: 1
+    position: 6
+    required: true
+    word_limit: null
+    notes: ""
+
+  - name: "Discussion"
+    level: 1
+    position: 7
+    required: true
+    word_limit: null
+    notes: ""
+
+  - name: "Conclusion"
+    level: 1
+    position: 8
+    required: true
+    word_limit: null
+    notes: "Some manuscripts merge Discussion and Conclusion — acceptable"
+
+  - name: "References"
+    level: 1
+    position: 9
+    required: true
+    word_limit: null
+    notes: ""
+
+abstract:
+  structured: true
+  structure:
+    - "Introduction"
+    - "Methods"
+    - "Results"
+    - "Conclusion"
+  word_limit: null
+  notes: "Structured with intro/methods/results/conclusion headings"
+
+headings:
+  style: "sentence case"
+  max_levels: 3
+  notes: "Not explicitly stated; sentence case is standard for Wiley journals"
+
+word_limit:
+  total: 10000
+  minimum: 6000
+  excludes: null
+  notes: "Preferred 6,000–10,000 words inclusive of Abstract, Article, References, Endnotes, Figures and Tables"
+
+figures:
+  max_count: null
+  format: "EPS, PDF, or TIFF"
+  resolution: "Highest resolution possible"
+  notes: "Must be uploaded as separate files at revision stage"
+
+tables:
+  max_count: null
+  notes: "Each table must have a title and footnotes. Separate files at revision stage."
+
+references:
+  style: "author-date"
+  max_count: null
+  notes: "Parenthetical (author date) style. Free format submission — no reformatting needed at submission; typesetter handles it."
+
+special_requirements:
+  - name: "JEL codes"
+    required: true
+    notes: "Compulsory. Must be attached as part of submission."
+
+  - name: "Data availability statement"
+    required: true
+    notes: "Required on title page and in main text. Must include link to repository if data shared."
+
+  - name: "Funding statement"
+    required: true
+    notes: "List all funding sources in the Acknowledgments section."
+
+  - name: "Conflict of interest disclosure"
+    required: true
+    notes: "Required on title page."
+
+  - name: "Ethics approval statement"
+    required: false
+    notes: "Required if applicable (studies involving human participants, etc.)"
+
+  - name: "ORCID ID"
+    required: true
+    notes: "Required for all authors."
+
+  - name: "Plain Language Summary"
+    required: false
+    word_limit: 200
+    notes: "Optional but encouraged. Single paragraph, no jargon, <200 words. Placed below abstract."
+
+  - name: "AI disclosure"
+    required: false
+    notes: "Required in Methods or Acknowledgments if AI tools used for content generation (not grammar/editing)."
+
+  - name: "Double-anonymised review"
+    required: true
+    notes: "Manuscript must be anonymised. Author details on separate title page file only."

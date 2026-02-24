@@ -92,3 +92,7 @@ End-to-end verification (run when pandoc + sample manuscript available):
 1. Run `/parse-guidelines [journal-name] [URL]` to set up your first journal
 2. Drop a manuscript into `manuscripts/`
 3. Run `/format-manuscript manuscripts/[file] [journal-name]`
+
+---
+**Context compaction () at 21:36**
+Check git log and quality_reports/plans/ for current state.
