@@ -176,49 +176,6 @@ LaTeX math in your manuscript (`$...$`, `$$...$$`, `\begin{equation}`) is automa
 
 The ingest script also supports a `--bibliography` flag to override the `.bib` file path when the source `.tex` references a different filename than what's on disk.
 
----
-
-## Examples
-
-### Formatting for IJE
-
-Here's what happens when formatting a ~10,000-word epidemiology manuscript for the International Journal of Epidemiology (3,000-word limit, structured abstract, Key Messages required):
-
-**Structural changes made automatically:**
-- Abstract restructured from 4-part to IJE's required 4-part format (Background/Methods/Results/Conclusions), trimmed to 250 words
-- "Policy Background" section merged into Introduction
-- "Data and Methods" + "Identification Strategy" merged into "Methods"
-- "Main Results" + "Investigating the Mechanisms" reorganised into "Results"
-- Section numbers stripped, sentence case applied to all headings
-- Key Messages (3 bullets), Keywords, and 7 Declaration subsections auto-drafted
-
-**Flagged for author action:**
-- Word count 3,900 vs 3,000 limit (WARN — author decides what to cut)
-- STROBE checklist required (observational study)
-- 10 DRAFT placeholder sections to complete before submission
-
-**Quality score: 90/100**
-
-### Formatting for PNAS
-
-Formatting a ~12,000-word epidemiology manuscript (originally structured for a Lancet-style journal) for PNAS initial submission:
-
-**Structural changes made automatically:**
-- Abstract converted from structured (bold markers: Background/Methods/Findings/Interpretation) to unstructured single paragraph
-- "Research in context" box removed (Lancet-specific)
-- Significance Statement auto-drafted (120-word PNAS requirement)
-- "Policy Background" merged into Introduction (heading implied per PNAS rules)
-- "Data and Methods" + "Identification Strategy" → "Materials and Methods" (moved after Discussion)
-- "Main Results" + "Investigating the Mechanisms" → "Results"
-- Data Availability and Author Contributions auto-drafted
-- LaTeX equations exported as native OOXML/MathType equations via `--mathml`
-
-**Flagged for author action:**
-- Word count ~12,000 vs ~4,000 target (WARN — format-neutral at initial submission)
-- 3 DRAFT sections to complete (Significance Statement, Data Availability, Author Contributions)
-- Author affiliations and corresponding author email needed
-
-**Quality score: 99/100**
 
 ---
 
