@@ -4,7 +4,7 @@
 
 *在 Vibe Research 时代，让 Agent 处理投稿格式，而让研究者专注于科学问题。*
 
-A structured Claude Code workflow to reformat research manuscripts for any journal's submission requirements — without altering scientific content, created by **朱晨 | 遗传社科研究**（https://zhuchencau.wordpress.com/cv/）. Special thanks to Pedro H. C. Sant'Anna for the claude-code-my-workflow repository, which inspired this workflow. 
+A structured Claude Code workflow to reformat research manuscripts for any journal's submission requirements — without altering scientific content, created by **朱晨 | 遗传社科研究**（https://zhuchencau.wordpress.com/）. Special thanks to Pedro H. C. Sant'Anna for the claude-code-my-workflow repository, which inspired this workflow. 
 
 Designed for Claude Code; scripts and guidelines are usable standalone with any LLM.
 
