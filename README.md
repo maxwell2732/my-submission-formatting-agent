@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/1165646565.svg)](https://doi.org/10.5281/zenodo.19026694)
+
 # Manuscript Submission Formatting Agent
 
 *在 Vibe Research 时代，让 Agent 处理投稿格式，而让研究者专注于科学问题。*
