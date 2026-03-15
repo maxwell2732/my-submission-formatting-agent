@@ -16,11 +16,16 @@ from pathlib import Path
 DEFAULT_REFERENCE = Path('templates/reference.docx')
 
 
+DEFAULT_CSL_DIR = Path('templates/csl')
+
+
 def export_docx(
     source: Path,
     output: Path,
     reference_doc: Path = DEFAULT_REFERENCE,
     mathml: bool = True,
+    bibliography: 'Path | None' = None,
+    csl: 'Path | None' = None,
 ) -> bool:
     """Convert markdown to docx using pandoc. Returns success bool."""
     if not source.exists():
@@ -41,12 +46,27 @@ def export_docx(
     # Use --mathml so LaTeX math converts to native OOXML equations in .docx
     math_args = ['--mathml'] if mathml else []
 
+    # Citation processing: --citeproc resolves [@key] citations using a .bib + .csl
+    cite_args = []
+    if bibliography:
+        if not bibliography.exists():
+            print(f"Warning: Bibliography file not found: {bibliography}", file=sys.stderr)
+        else:
+            cite_args.extend(['--citeproc', '--bibliography', str(bibliography)])
+            if csl:
+                if not csl.exists():
+                    print(f"Warning: CSL file not found: {csl}", file=sys.stderr)
+                else:
+                    cite_args.extend(['--csl', str(csl)])
+                    print(f"Citation style: {csl.stem}")
+
     cmd = [
         'pandoc',
         '--from', 'markdown',
         '--to', 'docx',
         *ref_args,
         *math_args,
+        *cite_args,
         '--output', str(output),
         str(source),
     ]
@@ -55,6 +75,9 @@ def export_docx(
     print(f"Output: {output}")
     if ref_args:
         print(f"Reference: {reference_doc}")
+    if cite_args:
+        print(f"Bibliography: {bibliography}")
+        print("Citations: will be resolved via citeproc")
 
     try:
         result = subprocess.run(
@@ -112,9 +135,23 @@ Customize it in Word, then save to templates/reference.docx.
         '--no-mathml', action='store_true', default=False,
         help='Disable MathML conversion (LaTeX math stays as images/text instead of native OOXML)'
     )
+    parser.add_argument(
+        '--bibliography', type=Path, default=None,
+        help='Path to .bib file — enables --citeproc to resolve [@key] citations'
+    )
+    parser.add_argument(
+        '--csl', type=Path, default=None,
+        help='Path to .csl citation style file (e.g. templates/csl/pnas.csl). '
+             'Without this, pandoc uses its default Chicago author-date style.'
+    )
 
     args = parser.parse_args()
-    success = export_docx(args.source, args.output, args.reference, mathml=not args.no_mathml)
+    success = export_docx(
+        args.source, args.output, args.reference,
+        mathml=not args.no_mathml,
+        bibliography=args.bibliography,
+        csl=args.csl,
+    )
     sys.exit(0 if success else 1)
 
 
