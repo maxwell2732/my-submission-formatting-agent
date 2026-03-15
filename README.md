@@ -1,6 +1,58 @@
 # Manuscript Submission Formatting Agent
 
-A structured Claude Code workflow to reformat research manuscripts for any journal's submission requirements — without altering scientific content.
+*在 Vibe Research 时代，让 Agent 处理投稿格式，而让研究者专注于科学问题。*
+
+A structured Claude Code workflow to reformat research manuscripts for any journal's submission requirements — without altering scientific content, created by **朱晨 | 遗传社科研究**（https://zhuchencau.wordpress.com/cv/）. Special thanks to Pedro H. C. Sant'Anna for the claude-code-my-workflow repository, which inspired this workflow. 
+
+
+## 中文简介
+
+该Agent解决的是科研流程中一个无聊且耗时的问题：**投稿格式整理（submission formatting）**。
+
+在学术论文投稿过程中，不同期刊往往有各自复杂且细碎的格式要求，例如：
+
+- 是否需要 **结构化摘要（structured abstract）**
+- 各章节的 **顺序与标题规范**
+- **引用格式**（author–year / Vancouver / superscript 等）
+- 是否必须包含 **Key Messages / Declarations / Ethics / Data availability**
+- 不同的 **字数限制与标题样式**
+
+当论文被拒稿后转投新期刊时，研究者通常需要花费 **数小时甚至更久** 来重新整理稿件格式——而这些工作 **并不会增加任何新的学术价值**。
+
+**Manuscript Submission Formatting Agent** 的目标就是自动完成这一过程。
+
+该工具基于 **Claude Code 工作流**，能够：
+
+- 自动解析目标期刊的 **Author Guidelines**
+- 分析论文结构并进行 **章节重排**
+- 自动补充 **期刊要求但缺失的投稿部分**
+- 调整 **引用格式、标题格式与章节结构**
+- 输出 **符合期刊投稿要求的 Word 手稿**
+
+整个系统遵循一个核心原则：
+
+> **只调整格式，不改变科研内容。**
+
+该工具 **不会修改论文中的数据、结果或结论**。  
+
+## 输入 / 输出
+
+**输入**
+
+- 原始论文文件  
+  - `.docx`
+    或
+  - `.tex`
+  - `.pdf`
+  - `.bib`
+- 目标期刊名称或 Author Guidelines URL
+
+**输出**
+
+- 符合投稿格式的 `.docx` 手稿
+- Markdown 版本（便于版本控制与编辑）
+- 投稿要求 **合规检查表（compliance checklist）**
+- **格式修改报告（formatting report）**
 
 **Last Updated:** 2026-03-15
 
@@ -21,6 +73,23 @@ Give this agent your manuscript and a journal's author guidelines URL. It parses
 
 > **Privacy:** `manuscripts/` and `outputs/` are gitignored. Your manuscripts never leave your machine or get pushed to GitHub.
 
+## 隐私与数据安全
+
+你的论文 **不会离开本地电脑**。
+
+在本仓库中：
+
+
+manuscripts/
+
+outputs/
+
+
+两个目录都被 `.gitignore` 忽略，因此：
+
+- 不会被上传到 GitHub
+- 不会进入远程仓库
+- 所有处理均在 **本地完成**
 ---
 
 ## Quick start
@@ -219,9 +288,10 @@ my-submission-formatting-agent/
 
 ---
 
-## Contributing
+## Author ｜ 作者
 
-Issues and pull requests welcome. If you adapt this for a specific journal or discipline, consider sharing your `guidelines/*.yml` files back.
+**Chen Zhu 朱晨** ｜ China Agricultural University 中国农业大学
+
 
 ## License
 
