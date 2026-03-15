@@ -485,13 +485,20 @@ class ManuscriptScorer:
         if not self.guidelines:
             return []
         required = self.guidelines.get('sections_required', [])
-        h1_texts = [h['text'].lower() for h in headings if h['level'] == 1]
+        all_heading_texts = [h['text'].lower() for h in headings]
         missing = []
         for r in required:
             if not r.get('required', True):
                 continue
+            # Skip level-0 sections (title, affiliations, keywords) — not headings
+            if r.get('level', 1) == 0:
+                continue
             name = r['name'].lower()
-            found = any(name in t or t in name for t in h1_texts)
+            # Check if the section notes say "do NOT include" heading (e.g., PNAS Introduction)
+            notes = (r.get('notes') or '').lower()
+            if 'do not include' in notes and 'heading' in notes:
+                continue
+            found = any(name in t or t in name for t in all_heading_texts)
             if not found:
                 missing.append(r['name'])
         return missing
@@ -500,7 +507,8 @@ class ManuscriptScorer:
         """Return list of non-compliant headings per guidelines style."""
         if not self.guidelines:
             return []
-        style = self.guidelines.get('headings', {}).get('style', '').lower()
+        style_raw = self.guidelines.get('headings', {}).get('style', '') or ''
+        style = style_raw.lower()
         if not style:
             return []
         noncompliant = []

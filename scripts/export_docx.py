@@ -20,6 +20,7 @@ def export_docx(
     source: Path,
     output: Path,
     reference_doc: Path = DEFAULT_REFERENCE,
+    mathml: bool = True,
 ) -> bool:
     """Convert markdown to docx using pandoc. Returns success bool."""
     if not source.exists():
@@ -37,11 +38,15 @@ def export_docx(
     # Create output directory if needed
     output.parent.mkdir(parents=True, exist_ok=True)
 
+    # Use --mathml so LaTeX math converts to native OOXML equations in .docx
+    math_args = ['--mathml'] if mathml else []
+
     cmd = [
         'pandoc',
         '--from', 'markdown',
         '--to', 'docx',
         *ref_args,
+        *math_args,
         '--output', str(output),
         str(source),
     ]
@@ -71,6 +76,8 @@ def export_docx(
     if output.exists():
         size_kb = output.stat().st_size / 1024
         print(f"Success: {output.name} ({size_kb:.1f} KB)")
+        if mathml:
+            print("MathML: enabled (LaTeX math → native OOXML equations)")
         if size_kb < 5:
             print("Warning: Output file is very small — check for conversion issues.", file=sys.stderr)
         return True
@@ -101,9 +108,13 @@ Customize it in Word, then save to templates/reference.docx.
         '--reference', type=Path, default=DEFAULT_REFERENCE,
         help=f'Reference docx template (default: {DEFAULT_REFERENCE})'
     )
+    parser.add_argument(
+        '--no-mathml', action='store_true', default=False,
+        help='Disable MathML conversion (LaTeX math stays as images/text instead of native OOXML)'
+    )
 
     args = parser.parse_args()
-    success = export_docx(args.source, args.output, args.reference)
+    success = export_docx(args.source, args.output, args.reference, mathml=not args.no_mathml)
     sys.exit(0 if success else 1)
 
 

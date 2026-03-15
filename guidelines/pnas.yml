@@ -1,0 +1,406 @@
+# Proceedings of the National Academy of Sciences (PNAS) - Research Article
+# Extracted from author guidelines and official PNAS template
+# Primary source: https://www.pnas.org/author-center/submitting-your-manuscript
+# Template source: PNAS RMarkdown/LaTeX template (2025 Overleaf version)
+#
+# Schema documentation:
+#   null    = field not specified in journal guidelines
+#   true    = yes / required
+#   false   = no / not required
+
+# ------------------------------------------------------------------
+# Identification
+# ------------------------------------------------------------------
+journal: "Proceedings of the National Academy of Sciences"
+abbreviation: "pnas"
+url: "https://www.pnas.org/author-center/submitting-your-manuscript"
+instructions_url: "https://www.pnas.org/author-center/submitting-your-manuscript#initial-submissions"
+editorial_policies_url: "https://www.pnas.org/author-center/editorial-and-journal-policies"
+extracted_date: "2026-03-15"
+article_type: "Research Article (Direct Submission)"
+notes: >
+  PNAS website returned 403 on direct fetch. Requirements assembled from
+  web search results referencing the canonical PNAS author guidelines, plus
+  the official PNAS manuscript template (LaTeX/RMarkdown). PNAS is
+  FORMAT-NEUTRAL at initial submission -- authors may submit a single PDF
+  with flexible formatting. However, full formatting requirements apply at
+  revision/acceptance. This file captures the full requirements for
+  compliance checking and final formatting.
+
+# ------------------------------------------------------------------
+# Initial Submission Policy
+# ------------------------------------------------------------------
+initial_submission:
+  format_neutral: true
+  single_pdf_allowed: true
+  notes: >
+    PNAS is format-neutral at initial submission. Authors need only upload
+    a single PDF file that includes main text, figures, tables, and
+    Supporting Information. Full formatting compliance is required at
+    revision. Despite format neutrality, the manuscript must still include
+    title, authors/affiliations, abstract, significance statement, and
+    complete text.
+
+# ------------------------------------------------------------------
+# Manuscript Formatting
+# ------------------------------------------------------------------
+formatting:
+  line_spacing: null
+  font: null
+  font_size: null
+  margins: null
+  page_size: null
+  notes: >
+    PNAS does not prescribe specific font, spacing, or margin requirements
+    for submitted manuscripts. The published format uses two-column layout
+    averaging 67 characters (including spaces) per line. Standard fonts
+    (Arial, Helvetica, Times, Symbol) are required for figure text.
+
+# ------------------------------------------------------------------
+# Sections Required (recommended order for Research Articles)
+# ------------------------------------------------------------------
+# PNAS states: "Many authors find it useful to organize their manuscripts
+# with the following order of sections... Other orders and headings are
+# permitted."
+sections_required:
+  - name: "Title"
+    level: 0
+    position: 1
+    required: true
+    word_limit: null
+    notes: "Should state the main advance or finding"
+
+  - name: "Author Affiliations"
+    level: 0
+    position: 2
+    required: true
+    word_limit: null
+    notes: >
+      Include department, institution, and complete address with ZIP/postal
+      code. Use lowercase letters to match authors with institutions.
+      ORCID ID may be supplied at submission.
+
+  - name: "Keywords"
+    level: 0
+    position: 3
+    required: true
+    word_limit: null
+    notes: "3-5 keywords, separated by pipe symbol (|)"
+
+  - name: "Abstract"
+    level: 0
+    position: 4
+    required: true
+    word_limit: 250
+    notes: >
+      Single paragraph, no more than 250 words. Must explain major
+      contributions to a general reader. References cited in the abstract
+      must be cited in full within the abstract itself.
+
+  - name: "Significance Statement"
+    level: 0
+    position: 5
+    required: true
+    word_limit: 120
+    notes: >
+      120-word maximum. Written at a level understandable to an
+      undergraduate-educated scientist outside the field. Explains
+      relevance in broad context. Appears in the paper itself.
+
+  - name: "Introduction"
+    level: 1
+    position: 6
+    required: true
+    word_limit: null
+    notes: >
+      Do NOT include the word "Introduction" as a section heading -- this
+      heading is implied in the first paragraphs. Exception: math articles
+      in the Physical Sciences section may use the heading.
+
+  - name: "Results"
+    level: 1
+    position: 7
+    required: true
+    word_limit: null
+    notes: null
+
+  - name: "Discussion"
+    level: 1
+    position: 8
+    required: true
+    word_limit: null
+    notes: null
+
+  - name: "Materials and Methods"
+    level: 1
+    position: 9
+    required: true
+    word_limit: null
+    notes: >
+      May be placed in Supporting Information if detailed, but sufficient
+      detail must remain in main text for readers to follow the logic. If
+      the paper is fundamentally a study of a new method, methods must be
+      described completely in main text.
+
+  - name: "Acknowledgments"
+    level: 1
+    position: 10
+    required: true
+    word_limit: null
+    notes: >
+      Single paragraph. Do not include acknowledgments in the Supporting
+      Information or anywhere else in the manuscript.
+
+  - name: "References"
+    level: 1
+    position: 11
+    required: true
+    word_limit: null
+    notes: null
+
+# ------------------------------------------------------------------
+# Abstract
+# ------------------------------------------------------------------
+abstract:
+  structured: false
+  structure: null
+  word_limit: 250
+  format: "single paragraph"
+  notes: >
+    Unstructured, single paragraph, max 250 words. Must explain major
+    contributions to a general reader. References in the abstract must
+    be cited in full within the abstract and also cited in the text.
+
+# ------------------------------------------------------------------
+# Significance Statement
+# ------------------------------------------------------------------
+significance_statement:
+  required: true
+  word_limit: 120
+  notes: >
+    Required for all research papers. 120-word maximum. Must be written
+    at a level understandable to an undergraduate-educated scientist
+    outside the author's field of specialty. Primary goal is to explain
+    the relevance of the work in broad context to a broad readership.
+    Appears in the published paper.
+
+# ------------------------------------------------------------------
+# Headings
+# ------------------------------------------------------------------
+headings:
+  style: null
+  max_levels: null
+  notes: >
+    PNAS does not explicitly specify sentence case vs title case in the
+    guidelines. The template and published articles typically use bold
+    sentence-style headings for subsections. The "Introduction" heading
+    is implied (not written) for the opening section. "Other orders and
+    headings are permitted." Verify against recent published articles.
+
+# ------------------------------------------------------------------
+# Word / Character / Page Limit
+# ------------------------------------------------------------------
+word_limit:
+  total: null
+  character_limit: 39000
+  character_limit_includes: "spaces"
+  page_limit: 6
+  page_limit_includes: "all text, spaces, and the number of characters displaced by figures, tables, and equations"
+  approximate_words: 4000
+  excludes: null
+  notes: >
+    PNAS uses page count as the primary limit: 6 pages for Direct
+    Submission research articles. When submitting tables, figures, and/or
+    equations in addition to text, keep the text under 39,000 characters
+    (including spaces). A standard 6-page article is approximately 4,000
+    words, 50 references, and 4 medium-size graphical elements. The
+    two-column format averages 67 characters (including spaces) per line.
+
+# ------------------------------------------------------------------
+# Keywords
+# ------------------------------------------------------------------
+keywords:
+  required: true
+  count: "3-5"
+  separator: "|"
+  notes: "3 to 5 keywords, separated by the pipe symbol"
+
+# ------------------------------------------------------------------
+# Figures
+# ------------------------------------------------------------------
+figures:
+  max_count: null
+  format: "TIFF, EPS, or high-resolution PDF"
+  resolution: "300 DPI for halftones, 600-900 DPI for combinations, 1000-1200 DPI for line art"
+  color_mode: "RGB (red, green, blue)"
+  size_single_column: null
+  size_double_column: "11.4 cm or 17.8 cm wide"
+  notes: >
+    Images must be final size. Color images must be in RGB mode.
+    Include font files for any text in figures. Use standard fonts
+    (Arial, Helvetica, Times, Symbol, Mathematical Pi, European Pi).
+    Size text in figures to at least 6-8 points. Figures may not be
+    embedded in manuscript text for SI. When saving TIFF files, use
+    only LZW compression; do not use JPEG compression. Do not save
+    figure numbers, legends, or author names as part of the image.
+    Composite figures must be pre-assembled. Authors may submit U3D or
+    PRC files for 3D images, accompanied by 2D representations.
+    A standard 6-page article accommodates approximately 4 medium-size
+    graphical elements (figures and tables combined).
+
+# ------------------------------------------------------------------
+# Tables
+# ------------------------------------------------------------------
+tables:
+  max_count: null
+  notes: >
+    No explicit maximum stated. Tables count toward the 6-page limit.
+    A standard 6-page article accommodates approximately 4 medium-size
+    graphical elements (figures and tables combined).
+
+# ------------------------------------------------------------------
+# References
+# ------------------------------------------------------------------
+references:
+  style: "PNAS (numbered, order of appearance)"
+  style_guide: "Scientific Style and Format: The CSE Manual for Authors, Editors, and Publishers, 8th edition, 2014"
+  in_text_format: "numbered in parentheses, e.g. (1) and (2, 3)"
+  max_count: null
+  approximate_count: 50
+  notes: >
+    References cited in numerical order as they appear in text. All
+    references including for SI should be included in the main manuscript
+    file. References appearing in both main text and SI should not be
+    duplicated. SI references included in tables should be included with
+    the main reference section. Unpublished abstracts presented at
+    meetings or references to "data not shown" are not permitted. Include
+    full title for each cited article. A standard 6-page article has
+    approximately 50 references. Author names listed in exact order of
+    original publication, using initials for first and middle names
+    without punctuation. Format: Author1 AB, Author2 CD (Year) Title.
+    Journal Abbreviation Volume(Issue):Pages.
+
+# ------------------------------------------------------------------
+# Supporting Information (SI)
+# ------------------------------------------------------------------
+supporting_information:
+  max_files: 10
+  movie_files_excluded_from_count: true
+  formats:
+    text: "Word, RTF, or LaTeX (LaTeX must include PDF companion)"
+    figures: "TIFF, EPS, high-resolution PDF, JPEG, or GIF"
+    tables: "Word, RTF, or LaTeX (one table per file)"
+    datasets: "Excel (.xls), RTF, or PDF"
+    movies: "AVI, MOV, WMV, animated GIF, or MPEG (max 10 MB)"
+  numbering: "S1, S2, etc."
+  notes: >
+    Main text must stand on its own without SI. Refer to SI at
+    appropriate points in the text. Authors who place detailed materials
+    and methods in SI must provide sufficient detail in main text. For
+    TIFF figures, use only LZW compression. Do not save figure numbers,
+    legends, or author names as part of the image. Composite figures
+    must be pre-assembled. Movies should be submitted at desired
+    reproduction size and length. Each movie needs a brief legend in
+    Word or RTF. Still images required from each video file.
+
+# ------------------------------------------------------------------
+# Special Requirements
+# ------------------------------------------------------------------
+special_requirements:
+  - name: "Data Availability Statement"
+    required: true
+    notes: >
+      All materials, data, associated protocols, code, and scripts must
+      be available in a public repository upon publication. Data must be
+      deposited in community-approved publicly accessible repositories
+      prior to publication. Research datasets (original or previously
+      published) must be cited in the references. A statement detailing
+      sharing plans must be included in the manuscript. Use DataCite
+      Repository Finder for appropriate repositories; general repositories
+      (figshare, Dryad, Open Science Framework) accepted when
+      subject-specific repositories are unavailable. Policy applies to
+      submissions beginning January 1, 2024. Authors must provide raw
+      data upon request during peer review or post-publication.
+
+  - name: "Author Contributions"
+    required: true
+    notes: >
+      Required. Provide details of author contributions. Authorship must
+      be limited to those who have contributed substantially to the work.
+
+  - name: "Competing Interest / Conflict of Interest Declaration"
+    required: true
+    notes: >
+      Authors must disclose any association that poses or could be
+      perceived as posing a financial or personal competing interest.
+      Must acknowledge all funding sources. Disclosures must be entered
+      directly into the submission system (not via link to external
+      website). Competing interests are relevant if they occurred within
+      48 months prior to submission.
+
+  - name: "ORCID"
+    required: false
+    notes: >
+      Authors with an ORCID ID may supply this at submission. Not
+      strictly required for PNAS (unlike PNAS Nexus which requires it
+      for corresponding author).
+
+  - name: "Cover Letter"
+    required: false
+    notes: >
+      Not strictly required but recommended. Must provide a list of
+      appropriate Editorial Board members, NAS members, and qualified
+      reviewers (minimum of three each). Brief justification for
+      suggested reviewers welcomed, especially for interdisciplinary
+      papers. Can include information that cannot be conveyed on the
+      submission form. Acceptable formats: Word, PDF, RTF, or LaTeX.
+      Reviewers will not routinely see the cover letter.
+
+  - name: "Suggested Reviewers"
+    required: true
+    notes: >
+      Must provide at least 3 appropriate Editorial Board members,
+      3 NAS members, and 3 qualified reviewers who are experts in the
+      paper's scientific area.
+
+  - name: "Ethics Statement"
+    required: null
+    notes: >
+      Not explicitly detailed in the extracted guidelines. Authors should
+      check PNAS editorial policies for human subjects, animal research,
+      and clinical trial registration requirements.
+
+  - name: "Funding Statement"
+    required: true
+    notes: >
+      All funding sources supporting the work must be acknowledged.
+      Included as part of the competing interest disclosure.
+
+# ------------------------------------------------------------------
+# Extraction Confidence
+# ------------------------------------------------------------------
+extraction_confidence:
+  high:
+    - "Abstract: 250 words, single paragraph, unstructured"
+    - "Significance Statement: 120 words, required"
+    - "Page limit: 6 pages for Direct Submission"
+    - "Character limit: 39,000 characters (including spaces) for text"
+    - "Reference style: numbered, order of appearance"
+    - "Figure formats: TIFF, EPS, high-resolution PDF"
+    - "Data availability: required, public repository"
+    - "Format-neutral at initial submission"
+    - "Keywords: 3-5, pipe-separated"
+    - "Introduction heading is implied (not written)"
+    - "SI files: max 10 (excluding movies)"
+  medium:
+    - "Section order: recommended but not mandatory ('other orders permitted')"
+    - "Approximate word count ~4000 and ~50 references for 6-page article"
+    - "Heading style: not explicitly stated; inferred from template/published articles"
+    - "Author contributions and competing interest: required but format details limited"
+    - "Cover letter: optional but reviewer suggestions are required"
+  low:
+    - "Ethics/IRB statement: not found in extracted text, marked null"
+    - "Max figure/table count: not explicitly stated, only the ~4 guideline"
+    - "Max reference count: not explicitly stated, only the ~50 approximation"
+    - "Heading case style: not found; needs verification against published articles"
+    - "Clinical trial registration: not found in extracted text"
