@@ -1,0 +1,315 @@
+# International Journal of Epidemiology (IJE) - Original Article
+# Extracted from author guidelines: https://academic.oup.com/ije/pages/general_instructions
+# Note: OUP page returned 403 on direct fetch; requirements assembled from
+#       multiple web searches against the same canonical source pages.
+#
+# Schema documentation:
+#   null    = field not specified in journal guidelines
+#   true    = yes / required
+#   false   = no / not required
+
+# ------------------------------------------------------------------
+# Identification [REQUIRED]
+# ------------------------------------------------------------------
+journal: "International Journal of Epidemiology"
+abbreviation: "ije"
+url: "https://academic.oup.com/ije/pages/general_instructions"
+instructions_url: "https://academic.oup.com/ije/pages/Instructions_To_Authors"
+extracted_date: "2026-03-15"
+article_type: "Original Article"
+notes: >
+  OUP guidelines page blocked direct scraping (403). Requirements extracted
+  from web search results that reference the canonical IJE author guidelines.
+  Some fields (heading style, max heading levels, max table/figure count,
+  max reference count) could not be confirmed and are marked null. Authors
+  should verify against the live page before submission.
+
+# ------------------------------------------------------------------
+# Manuscript Formatting
+# ------------------------------------------------------------------
+formatting:
+  line_spacing: "double"
+  margins: "2.5 cm"
+  page_numbers: true
+  font: null
+  font_size: null
+  notes: "Manuscripts should be double spaced with margins of 2.5 cm. All pages should be numbered."
+
+# ------------------------------------------------------------------
+# Title Page
+# ------------------------------------------------------------------
+title_page:
+  required: true
+  elements:
+    - "Title"
+    - "Author names and affiliations"
+    - "Word count"
+  notes: "Title page should include author names, affiliations, and word count."
+
+# ------------------------------------------------------------------
+# Required Sections [REQUIRED]
+# List sections in the ORDER the journal requires them.
+# ------------------------------------------------------------------
+sections_required:
+  - name: "Title Page"
+    level: 0
+    position: 0
+    required: true
+    word_limit: null
+    notes: "Includes title, authors, affiliations, word count"
+
+  - name: "Abstract"
+    level: 1
+    position: 1
+    required: true
+    word_limit: 250
+    notes: "Structured abstract in four sections; 3-10 keywords at end of abstract"
+
+  - name: "Key Messages"
+    level: 1
+    position: 2
+    required: true
+    word_limit: null
+    notes: "3 bullet points, each a single complete sentence. Placed after keywords, before Introduction."
+
+  - name: "Introduction"
+    level: 1
+    position: 3
+    required: true
+    word_limit: null
+    notes: ""
+
+  - name: "Methods"
+    level: 1
+    position: 4
+    required: true
+    word_limit: null
+    notes: "Include study period and sample size"
+
+  - name: "Results"
+    level: 1
+    position: 5
+    required: true
+    word_limit: null
+    notes: "Include main results with estimates and confidence intervals"
+
+  - name: "Discussion"
+    level: 1
+    position: 6
+    required: true
+    word_limit: null
+    notes: ""
+
+  - name: "Acknowledgements"
+    level: 1
+    position: 7
+    required: false
+    word_limit: null
+    notes: "If applicable"
+
+  - name: "Funding"
+    level: 1
+    position: 8
+    required: true
+    word_limit: null
+    notes: "Part of end-matter declarations"
+
+  - name: "Conflict of Interest"
+    level: 1
+    position: 9
+    required: true
+    word_limit: null
+    notes: "If none, state 'Conflict of Interest: none declared'. CoI form also required at submission."
+
+  - name: "Data Availability"
+    level: 1
+    position: 10
+    required: true
+    word_limit: null
+    notes: "Under heading 'Data availability' in end matter"
+
+  - name: "Author Contributions"
+    level: 1
+    position: 11
+    required: false
+    word_limit: null
+    notes: "ICMJE authorship criteria must be met"
+
+  - name: "References"
+    level: 1
+    position: 12
+    required: true
+    word_limit: null
+    notes: ""
+
+# ------------------------------------------------------------------
+# Abstract [REQUIRED]
+# ------------------------------------------------------------------
+abstract:
+  structured: true
+  structure:
+    - "Background"
+    - "Methods"
+    - "Results"
+    - "Conclusions"
+  word_limit: 250
+  character_limit: null
+  notes: >
+    Structured in four sections. Methods section should include study period
+    and sample size. Results section should include main results with
+    estimates and confidence intervals.
+
+# ------------------------------------------------------------------
+# Keywords
+# ------------------------------------------------------------------
+keywords:
+  required: true
+  min_count: 3
+  max_count: 10
+  placement: "At the end of the Abstract"
+  notes: "Three to ten keywords provided at the end of the abstract."
+
+# ------------------------------------------------------------------
+# Key Messages
+# ------------------------------------------------------------------
+key_messages:
+  required: true
+  bullet_count: 3
+  format: "bullet points"
+  placement: "After keywords, before Introduction"
+  notes: >
+    Each bullet point should be a single, complete sentence that
+    succinctly describes main findings/messages of the paper.
+
+# ------------------------------------------------------------------
+# Headings
+# ------------------------------------------------------------------
+headings:
+  style: "sentence case"
+  max_levels: null
+  notes: >
+    Heading style confirmed as sentence case based on published IJE articles.
+    Footnotes are NOT permitted in the main body (only in tables and figures).
+
+# ------------------------------------------------------------------
+# Word / Length Limits [REQUIRED]
+# ------------------------------------------------------------------
+word_limit:
+  total: 3000
+  excludes: "abstract, key messages, declarations, references, tables, figures, supplementary material"
+  character_limit: null
+  notes: >
+    3000 words for main text only. If the paper exceeds guidelines,
+    authors should explain why in the cover letter.
+
+# ------------------------------------------------------------------
+# Figures
+# ------------------------------------------------------------------
+figures:
+  max_count: null
+  format: "EPS, TIFF, PNG, or JPG (not PDF, DOCX, or PPTX)"
+  resolution: "300 DPI minimum at 300 mm width (3600 pixels minimum width)"
+  max_size_mb: null
+  notes: >
+    Each figure submitted separately from text as an image file.
+    Journal strongly encourages illustrating one or two main findings
+    with a table or figure. Do NOT submit figures in PDF, DOCX, or PPTX format.
+
+# ------------------------------------------------------------------
+# Tables
+# ------------------------------------------------------------------
+tables:
+  max_count: null
+  notes: >
+    Tables should be properly formatted with captions and numbered
+    consecutively. Footnotes may only be used in tables and figures
+    (not in main body text). Journal encourages illustrating main
+    findings with tables/figures.
+
+# ------------------------------------------------------------------
+# References
+# ------------------------------------------------------------------
+references:
+  style: "Vancouver (numbered, superscript)"
+  max_count: null
+  in_text_format: "Superscript numbers in sequential order"
+  multiple_citations: "Use commas (1,2) or ranges (1-4)"
+  author_limit: 6
+  author_limit_rule: "List all authors when 6 or fewer; when 7+, list first 3 then 'et al.'"
+  format_notes: >
+    Surnames and initials of authors, title of article, journal name
+    abbreviated per Index Medicus, year, volume, first and last page numbers.
+  notes: >
+    Maximum reference count not explicitly stated. References listed
+    in order of appearance in text.
+
+# ------------------------------------------------------------------
+# Supplementary Materials
+# ------------------------------------------------------------------
+supplementary_materials:
+  permitted: true
+  formats: "PDF, DOC, HTML, RTF, XLS, CSV, MP3, MPEG"
+  notes: >
+    Should contain supporting material that cannot be in the printed
+    version but benefits the reader. Must NOT be essential to understanding
+    the conclusions. All text and figures must be in suitable electronic formats.
+
+# ------------------------------------------------------------------
+# Reporting Guidelines
+# ------------------------------------------------------------------
+reporting_guidelines:
+  - name: "STROBE"
+    applies_to: "Observational studies (case-control, cohort, cross-sectional)"
+    required: true
+    notes: "Follow STROBE statement and complete relevant checklist"
+
+  - name: "RECORD"
+    applies_to: "Studies using routinely collected health data"
+    required: true
+    notes: "Follow RECORD statement and complete relevant checklist in addition to STROBE"
+
+# ------------------------------------------------------------------
+# Special Requirements
+# ------------------------------------------------------------------
+special_requirements:
+  - name: "Data availability statement"
+    required: true
+    notes: >
+      Must be included under heading 'Data availability' in end matter.
+      Make all software code available. Strongly encouraged to make all
+      data available. Deposit in public repository when possible.
+
+  - name: "Funding statement"
+    required: true
+    notes: "Part of end-matter declarations, after Acknowledgements."
+
+  - name: "Conflict of Interest declaration"
+    required: true
+    notes: >
+      CoI form must be submitted via online system at first submission.
+      Statement in manuscript: if none, state 'Conflict of Interest: none declared'.
+      Failure to submit CoI form will delay processing.
+
+  - name: "Ethics approval"
+    required: true
+    notes: "Required for studies involving human participants."
+
+  - name: "Author contributions"
+    required: false
+    notes: >
+      Corresponding author must ensure all listed authors meet ICMJE
+      authorship criteria and no qualifying author is omitted.
+
+  - name: "AI use declaration"
+    required: true
+    notes: "Authors should declare use of AI tools in the declarations section."
+
+  - name: "Cover letter"
+    required: false
+    notes: >
+      Required if paper exceeds any stated guidelines -- must explain
+      why exceeding limits is necessary.
+
+  - name: "STROBE/RECORD checklist"
+    required: true
+    notes: "Required for observational studies. See reporting_guidelines section."

@@ -8,7 +8,7 @@ paths:
 ## The Safe Processing Workflow
 
 **Step 1: Receive PDF Upload**
-- User uploads PDF to `master_supporting_docs/supporting_papers/` or `supporting_slides/`
+- User uploads PDF to `master_supporting_docs/supporting_papers/`
 - Claude DOES NOT attempt to read it directly
 
 **Step 2: Check PDF Properties**
